@@ -7,7 +7,6 @@ import { Home, Group, Project, Follows, AddProject, Login } from './containers/i
 import { Alert } from 'antd';
 import User from './containers/User/User.js';
 import Header from './components/Header/Header';
-import Footer from './components/Footer/Footer';
 import Loading from './components/Loading/Loading';
 import MyPopConfirm from './components/MyPopConfirm/MyPopConfirm';
 import { checkLoginState } from './reducer/modules/user';
@@ -22,7 +21,7 @@ const alertContent = () => {
   const ua = window.navigator.userAgent,
     isChrome = ua.indexOf("Chrome") && window.chrome;
   if (!isChrome) {
-    return <Alert style={{ zIndex: 99 }} message={'YApi 的接口测试等功能仅支持 Chrome 浏览器，请使用 Chrome 浏览器获得完整功能。'} banner closable />
+    return <Alert style={{ zIndex: 99 }} message={'接口测试等功能仅支持 Chrome 浏览器，请使用 Chrome 浏览器获得完整功能。'} banner closable />
   }
 }
 
@@ -131,7 +130,6 @@ export default class App extends Component {
                 {/* <Route path="/statistic" component={statisticsPage} /> */}
               {/* </div> */}
             </div>
-            <Footer />
           </div>
         </Router >
 

@@ -5,8 +5,6 @@ import { Link } from 'react-router-dom';
 import { Row, Col, Button, Icon, Card } from 'antd';
 import PropTypes from "prop-types";
 import { withRouter } from 'react-router';
-import { getImgPath } from '../../common.js';
-import LogoSVG from '../../components/LogoSVG/index.js'
 import { changeMenuItem } from '../../reducer/modules/menu'
 const plugin = require('client/plugin.js');
 
@@ -24,7 +22,7 @@ const HomeGuest = () => (
         <Row>
           <Col span={24}>
             <div className="home-header">
-              <a href="#" className="item">YAPI</a>
+              <a href="#" className="item">Lemonce Mock Server</a>
               <a target="_blank" rel="noopener noreferrer" href="https://yapi.ymfe.org" className="item">使用文档</a>
             </div>
           </Col>
@@ -33,8 +31,7 @@ const HomeGuest = () => (
           <Col lg={9} xs={24}>
             <div className="home-des">
               <div className="logo">
-                <LogoSVG length='72px' />
-                <span className="name">YAPI</span>
+                <span className="name">Lemonce Mock Server</span>
               </div>
               <div className="detail">高效、易用、功能强大的API管理平台<br /><span className="desc">旨在为开发、产品、测试人员提供更优雅的接口管理服务</span></div>
               <div className="btn-group">
@@ -47,18 +44,13 @@ const HomeGuest = () => (
               </div>
             </div>
           </Col>
-          <Col lg={15} xs={0} className="col-img">
-            <div className="img-container">
-              <img className="img" src={getImgPath('/image/demo-img', 'jpg')} />
-            </div>
-          </Col>
         </Row>
       </div>
     </div>
     <div className="feat-part section-feature">
       <div className="container home-section">
         <h3 className="title">为API开发者设计的管理平台</h3>
-        <span className="desc">YApi让接口开发更简单高效，让接口的管理更具可读性、可维护性，让团队协作更合理。</span>
+        <span className="desc">让接口开发更简单高效，让接口的管理更具可读性、可维护性，让团队协作更合理。</span>
         <Row key="feat-motion-row">
           <Col span={8} className="section-item" key="feat-wrapper-1">
             <Icon type="appstore-o" className="img" />
@@ -155,7 +147,7 @@ const HomeGuest = () => (
             <Icon type="team" className="icon" />
             <h3 className="title">扁平化管理模式</h3>
             <p className="desc">接口管理的逻辑较为复杂，操作频率高，层层审批将严重拖慢生产效率，因此传统的金字塔管理模式并不适用。</p>
-            <p className="desc">YAPI 将扁平化管理模式的思想引入到产品的权限管理中，超级管理员拥有最高的权限，并将权限分配给若干组长，超级管理员只需管理组长即可，实际上管理YAPI各大分组与项目的是“组长”。组长对分组或项目负责，一般由BU负责人/项目负责人担任。</p>
+            <p className="desc">将扁平化管理模式的思想引入到产品的权限管理中，超级管理员拥有最高的权限，并将权限分配给若干组长，超级管理员只需管理组长即可，实际上管理各大分组与项目的是“组长”。组长对分组或项目负责，一般由BU负责人/项目负责人担任。</p>
           </Col>
         </Row>
       </div>

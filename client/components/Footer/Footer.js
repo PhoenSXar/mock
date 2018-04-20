@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import { Row, Col } from 'antd';
 import { Icon } from 'antd'
 // import packageJson from '../../../package.json';
-const version = process.env.version
 class Footer extends Component {
   constructor(props) {
     super(props)
@@ -47,55 +46,7 @@ class FootItem extends Component {
 }
 
 Footer.defaultProps = {
-  footList: [
-    {
-      title: 'GitHub',
-      iconType: 'github',
-      linkList: [
-        {
-          itemTitle: 'YApi 源码仓库',
-          itemLink: 'https://github.com/YMFE/yapi'
-        }
-      ]
-
-    },
-    {
-      title: '团队',
-      iconType: 'team',
-      linkList: [
-        {
-          itemTitle: 'YMFE',
-          itemLink: 'https://ymfe.org'
-        }
-      ]
-
-    },
-    {
-      title: '反馈',
-      iconType: 'aliwangwang-o',
-      linkList: [
-        {
-          itemTitle: 'Github Issues',
-          itemLink: 'https://github.com/YMFE/yapi/issues'
-        },{
-          itemTitle: 'Github Pull Requests',
-          itemLink: 'https://github.com/YMFE/yapi/pulls'
-        }
-      ]
-    },
-    {
-      title: 'Copyright © 2017 YMFE',
-      linkList: [
-        {
-          itemTitle: '版本： ' + version,
-          itemLink: 'https://github.com/YMFE/yapi/blob/master/CHANGELOG.md'
-        }, {
-          itemTitle: '使用文档',
-          itemLink: 'https://yapi.ymfe.org'
-        }
-      ]
-    }
-  ]
+  footList: []
 }
 
 export default Footer
