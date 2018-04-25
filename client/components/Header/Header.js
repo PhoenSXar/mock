@@ -3,7 +3,7 @@ import React, { PureComponent as Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Icon, Layout, Menu, Dropdown, message, Tooltip, Popover } from 'antd'
+import { Icon, Layout, Menu, Dropdown, message, Tooltip, Popover, Tag } from 'antd'
 import { checkLoginState, logoutActions, loginTypeAction } from '../../reducer/modules/user'
 import { changeMenuItem } from '../../reducer/modules/menu'
 import { withRouter } from 'react-router';
