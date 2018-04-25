@@ -23,6 +23,7 @@ const HomeGuest = () => (
           <Col span={24}>
             <div className="home-header">
               <a href="#" className="item">Lemonce Mock Server</a>
+              <a target="_blank" rel="noopener noreferrer" href="http://139.129.235.147:3000/doc/documents/index.html" className="item">使用文档</a>
             </div>
           </Col>
         </Row>
