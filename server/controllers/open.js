@@ -138,7 +138,7 @@ class openController extends baseController{
     if (ctx.params.email === true && reportsResult.message.failedNum !== 0) {
       let autoTestUrl = `http://${ctx.request.host}/api/open/run_auto_test?id=${id}&token=${token}&mode=${ctx.params.mode}`
       this.sendNotice(projectId, {
-        title: `YApi自动化测试报告`,
+        title: `Lemonce Mock Server自动化测试报告`,
         content: `
         <html>
         <head>

@@ -58,9 +58,6 @@ function createHtml5(left, tp, msg, runTime) {
       <h1>测试报告</h1>
       <div class="summary">${message}</div>
       ${tp}
-        <footer class="m-footer">
-          <p>Build by <a href="https://ymfe.org/">YMFE</a>.</p>
-        </footer>
       </div>
     </div>
   </body>
