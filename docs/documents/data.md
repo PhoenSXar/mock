@@ -1,6 +1,6 @@
 # 数据导入
 
-在数据管理可快速导入其他格式的接口数据，方便快速添加接口。YApi 目前支持 postman, swagger, har 数据导入。
+在数据管理可快速导入其他格式的接口数据，方便快速添加接口。Lemonce Mock Server 目前支持 postman, swagger, har 数据导入。
 
 ## Postman 数据导入
 1.首先在postman导出接口
@@ -11,7 +11,7 @@
 
 <div><img  class="doc-img"  style="width:70%"  src="./images/usage/postman-2.jpg" /></div>
 
-3.打开yapi平台，进入到项目页面，点击数据管理，选择相应的分组和postman导入方式，选择刚才保存的文件路径，开始导入数据
+3.打开Lemonce Mock Server平台，进入到项目页面，点击数据管理，选择相应的分组和postman导入方式，选择刚才保存的文件路径，开始导入数据
 
 <div><img  class="doc-img"  style="width:90%"  src="./images/usage/postman-3.jpg" /></div>
 
@@ -26,7 +26,7 @@
 
 <div><img  class="doc-img" style="width:70%" src="./images/usage/chrome-2.jpg" /></div>
 
-3.打开yapi平台，进入到项目页面，点击数据管理，选择相应的分组和har导入方式，选择刚才保存的文件路径，开始导入数据
+3.打开Lemonce Mock Server平台，进入到项目页面，点击数据管理，选择相应的分组和har导入方式，选择刚才保存的文件路径，开始导入数据
 
 <div><img class="doc-img"   style="width:50%"  src="./images/usage/chrome-3.jpg" /></div>
 
@@ -37,7 +37,7 @@
 <br />
 1.生成 JSON 语言编写的 Swagger API 文档文件<div>  例如这样的数据 （<a href="http://petstore.swagger.io/v2/swagger.json" target="blank">http://petstore.swagger.io/v2/swagger.json</a>），可以将其内容复制到 JSON 文件中。</div>
 
-2.打开yapi平台，进入到项目页面，点击数据管理，选择相应的分组和swagger导入方式，选择刚才的文件，开始导入数据
+2.打开Lemonce Mock Server平台，进入到项目页面，点击数据管理，选择相应的分组和swagger导入方式，选择刚才的文件，开始导入数据
 
 <div><img class="doc-img"   style="width:50%"  src="./images/usage/chrome-4.jpg" /></div>
 

@@ -2,7 +2,7 @@
 
 <p style='text-indent:2em;line-height:1.8em'>Web 应用通常是前后端分离开发的，后端提供调用的接口，前端使用接口返回 json 数据渲染到 UI，接口测试就是保证后端接口的数据正确性。
 
-对于很多团队，接口测试就是手动运行接口，肉眼比对接口返回的数据，这样的操作流程效率低下，容易出错。使用 YApi 只需要在可视化 GUI 下，配置下每个接口的入参和对 RESPONSE 断言，即可实现对接口的自动化测试，大大提升了接口测试的效率。<a target="_blank" href="https://blog.ymfe.org/api-autotest/#more">自动化测试实践</a></p>
+对于很多团队，接口测试就是手动运行接口，肉眼比对接口返回的数据，这样的操作流程效率低下，容易出错。使用 Lemonce Mock Server 只需要在可视化 GUI 下，配置下每个接口的入参和对 RESPONSE 断言，即可实现对接口的自动化测试，大大提升了接口测试的效率。<a target="_blank" href="https://blog.ymfe.org/api-autotest/#more">自动化测试实践</a></p>
 
 ## 测试列表
 
@@ -24,7 +24,7 @@ Mock 参数每次请求都会生成随机字符串
 
 #### 变量参数
 
-YApi 提供了强大的变量参数功能，你可以在测试的时候使用前面接口的 `参数` 或 `返回值` 作为 `后面接口的参数`，即使接口之间存在依赖，也可以轻松 **一键测试~**
+我们提供了强大的变量参数功能，你可以在测试的时候使用前面接口的 `参数` 或 `返回值` 作为 `后面接口的参数`，即使接口之间存在依赖，也可以轻松 **一键测试~**
 
 > Tips: 参数只能是测试过程中排在前面的接口中的变量参数
 
@@ -60,7 +60,7 @@ $.{key}.{params|body}.{path}
 
 > Tips: 上下拖动测试集合的列表项可以调整测试的顺序。
 
-目前 yapi 中的`query`，`body`,`header`和`pathParam`的输入参数已经支持点击选择功能。无需自己填写表达式，只需在弹窗中选择需要展示的表达式即可。 输入选项包括`常量`，`mock数据`，在测试集合中也支持`变量`选择。具体用法：单击编辑按钮打开表达式生成器，点击需要的数据创建表达式，这里也可以实时查看表达式结果。
+目前`query`，`body`,`header`和`pathParam`的输入参数已经支持点击选择功能。无需自己填写表达式，只需在弹窗中选择需要展示的表达式即可。 输入选项包括`常量`，`mock数据`，在测试集合中也支持`变量`选择。具体用法：单击编辑按钮打开表达式生成器，点击需要的数据创建表达式，这里也可以实时查看表达式结果。
 
 <img class="doc-img" style="width: 800px;" src="./images/usage/modal-postman.gif"  />
 
@@ -78,11 +78,6 @@ $.{key}.{params|body}.{path}
 ## 断言
 
 可通过 js 脚本写断言，实现精准测试，在接口用例页面点击 Test 编辑。
-
-<!-- <video style="width:800px" controls="controls" autoplay="autoplay">
-  <source src="http://yapi.demo.qunar.com/publicapi/auto-test.mp4" type="video/mp4" />
-Your browser does not support the video tag.
-</video> -->
 
 ### 公共变量
 

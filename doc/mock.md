@@ -1,8 +1,8 @@
 ## Mock介绍
 
- <p style='text-indent:2em;line-height:1.8em'>yapi的Mock功能可以根据用户的输入接口信息如协议、URL、接口名、请求头、请求参数、mock规则([点击到Mock规则](#mock)）生成Mock接口，这些接口会自动生成模拟数据，创建者可以自由构造需要的数据。而且与常见的Mock方式如将Mock写在代码里和JS拦截等相比yapi的Mock在使用场景和效率和复杂度上是相差甚远的，正是由于yapi的Mock是一个第三方平台，那么在团队开发时任何人都可以权限许可下创建、修改接口信息等操作，这对于团队开发是很有好处的。
+ <p style='text-indent:2em;line-height:1.8em'>Mock功能可以根据用户的输入接口信息如协议、URL、接口名、请求头、请求参数、mock规则([点击到Mock规则](#mock)）生成Mock接口，这些接口会自动生成模拟数据，创建者可以自由构造需要的数据。而且与常见的Mock方式如将Mock写在代码里和JS拦截等相比Lemonce Mock Server的Mock在使用场景和效率和复杂度上是相差甚远的，正是由于Lemonce Mock Server的Mock是一个第三方平台，那么在团队开发时任何人都可以权限许可下创建、修改接口信息等操作，这对于团队开发是很有好处的。
  
- **mock地址解析**：yapi平台网址+mock+**您的项目id**+**接口实际请求path**
+ **mock地址解析**：Lemonce Mock Server平台网址+mock+**您的项目id**+**接口实际请求path**
 
  注：项目id可以在项目设置里查看到
  
@@ -11,10 +11,10 @@
 
 ### 1 如何使用Mock?
 ### 1.1 最简单最直接的方式
-在代码直接请求yapi提供的mock地址，以jQuery为例：
+在代码直接请求Lemonce Mock Server提供的mock地址，以jQuery为例：
 
 ````javascript
-let prefix = 'http://yapi.local.qunar.com:3000/mock/2817'
+let prefix = 'http://Lemonce Mock Server.local.qunar.com:3000/mock/2817'
 $.post(prefix+'/baseapi/path', {username: 'xxx'}, function(res){
     console.log(res) //返回上图预览部分的数据
 })
@@ -29,7 +29,7 @@ $.post(prefix+'/baseapi/path', {username: 'xxx'}, function(res){
 ```` nginx
 location /baseapi
 {
-proxy_pass   http://yapi.local.qunar.com:3000/mock/2817/baseapi; #baseapi后面没有"/"
+proxy_pass   http://Lemonce Mock Server.local.qunar.com:3000/mock/2817/baseapi; #baseapi后面没有"/"
 }
 ````
 
@@ -168,7 +168,7 @@ Mock.mock({
 @占位符
 
 说明：
-1. 用 @ 来标识其后的字符串是 占位符，在YApi提供的Mock输入框在输入“@”后会自动提示占位符。
+1. 用 @ 来标识其后的字符串是 占位符，在Lemonce Mock Server提供的Mock输入框在输入“@”后会自动提示占位符。
 
 例如：
 name: {

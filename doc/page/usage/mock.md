@@ -1,12 +1,12 @@
 ## Mock介绍
 
- <p style='text-indent:2em;line-height:1.8em'>YApi的 Mock 功能可以根据用户的输入接口信息如协议、URL、接口名、请求头、请求参数、返回数据（[返回数据](#mock)）生成 Mock 接口，这些接口会自动生成模拟数据，创建者可以自由构造需要的数据。 </p>
+ <p style='text-indent:2em;line-height:1.8em'>Mock 功能可以根据用户的输入接口信息如协议、URL、接口名、请求头、请求参数、返回数据（[返回数据](#mock)）生成 Mock 接口，这些接口会自动生成模拟数据，创建者可以自由构造需要的数据。 </p>
  
- **mock地址解析**：`YApi平台网址 + mock + 您的项目id + 接口实际请求path`
+ **mock地址解析**：`Lemonce Mock Server平台网址 + mock + 您的项目id + 接口实际请求path`
 
- 假设你 YApi 的部署地址为：http://yapi.xxx.com 然后用这个地址作为示例
+ 假设你 Lemonce Mock Server 的部署地址为：http://lemonce.xxx.com 然后用这个地址作为示例
 
-    mockd 地址： http://yapi.xxx.com/mock/29/api/hackathon/login
+    mockd 地址： http://lemonce.xxx.com/mock/29/api/hackathon/login
 
  > 注：项目 id 可以在项目设置里查看到
  
@@ -35,7 +35,7 @@
 
 
 ### 原理
-YApi Mock 功能基于 node 和 [mockjs](http://mockjs.com)，跟 Mockjs 区别是 yapi 基于 json 定义 mock ，无法使用 mockjs 原有的函数功能，正则表达式需要基于 rule 书写，示例如下：
+ Mock 功能基于 node 和 [mockjs](http://mockjs.com)，跟 Mockjs 区别是 Lemonce Mock Server 基于 json 定义 mock ，无法使用 mockjs 原有的函数功能，正则表达式需要基于 rule 书写，示例如下：
 
 ```
 {
@@ -59,12 +59,12 @@ YApi Mock 功能基于 node 和 [mockjs](http://mockjs.com)，跟 Mockjs 区别�
 
 ### 如何使用 Mock
 
-#### 1 在 js 代码直接请求yapi提供的 mock 地址（不用担心跨域问题）
+#### 1 在 js 代码直接请求Lemonce Mock Server提供的 mock 地址（不用担心跨域问题）
 
-在代码直接请求 yapi 提供的 mock 地址，以 jQuery 为例：
+在代码直接请求 Lemonce Mock Server 提供的 mock 地址，以 jQuery 为例：
 
 ````javascript
-let prefix = 'http://yapi.xxx.com/mock/2817'
+let prefix = 'http://lemonce.xxx.com/mock/2817'
 $.post(prefix+'/baseapi/path', {username: 'xxx'}, function(res){
     console.log(res) //返回上图预览部分的数据
 })
@@ -79,7 +79,7 @@ $.post(prefix+'/baseapi/path', {username: 'xxx'}, function(res){
 ```` nginx
 location /baseapi
 {
-proxy_pass   http://yapi.xxx.com/mock/2817/baseapi; #baseapi后面没有"/"
+proxy_pass   http://lemonce.xxx.com/mock/2817/baseapi; #baseapi后面没有"/"
 }
 ````
 
@@ -88,11 +88,11 @@ proxy_pass   http://yapi.xxx.com/mock/2817/baseapi; #baseapi后面没有"/"
 ```javascript
 {
     pattern: /\/api\/(.*)/,
-    responder: 'http://yapi.xxx.com/mock/58/api/$1'
+    responder: 'http://lemonce.xxx.com/mock/58/api/$1'
 }
 ```
 
-上面通过正则匹配，将所有接口转到 http://yapi.xxx.com 上，比如 `http://localhost/api/user/status` 会成为 `http://yapi.xxx.com/mock/58/api/user/status`
+上面通过正则匹配，将所有接口转到 http://lemonce.xxx.com 上，比如 `http://localhost/api/user/status` 会成为 `http://lemonce.xxx.com/mock/58/api/user/status`
 
 详细使用指南: <a target="_blank" href="https://ykit.ymfe.org/plugins-mock.html#获取远程数据_Map_Remote_">ykit-config-mock</a>
 
@@ -236,7 +236,7 @@ Mock.mock({
 @占位符
 
 说明：
-1. 用 @ 来标识其后的字符串是 占位符，在YApi提供的Mock输入框在输入“@”后会自动提示占位符。
+1. 用 @ 来标识其后的字符串是 占位符，在Lemonce Mock Server提供的Mock输入框在输入“@”后会自动提示占位符。
 
 例如：
 name: {

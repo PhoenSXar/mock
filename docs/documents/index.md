@@ -1,8 +1,7 @@
-# YApi
-在开始使用 YApi 之前，我们先来熟悉一下 YApi 的网站结构，这将让你快速了解YApi。
+# Lemonce Mock Server
 
 ## 登录与注册
-想要使用 YApi ，首先要注册账号。
+想要使用 Lemonce Mock Server ，首先要注册账号。
 
 <img src="./images/usage/login.png" />
 

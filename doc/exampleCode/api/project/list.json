@@ -5,9 +5,9 @@
         "list": [
             {
                 "_id": 529,
-                "name": "yapi",
+                "name": "mock server",
                 "desc": "aaa",
-                "prd_host": "http://www.yapi.com",
+                "prd_host": "http://www.mock.com",
                 "basepath": "/a/",
                 "uid": 107,
                 "group_id": 181,

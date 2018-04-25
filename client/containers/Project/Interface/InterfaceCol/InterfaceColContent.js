@@ -497,7 +497,7 @@ class InterfaceColContent extends Component {
       header: {
         label: 'key',
         formatters: [() => {
-          return <Tooltip title={<span>每个用例都有唯一的key，用于获取所匹配接口的响应数据，例如使用 <a href="https://yapi.ymfe.org/case.html#变量参数" className="link-tooltip" target="blank">变量参数</a> 功能</span>}>
+          return <Tooltip title={<span>每个用例都有唯一的key，用于获取所匹配接口的响应数据，例如使用 <a href="http://139.129.235.147:3000/doc/case.html#变量参数" className="link-tooltip" target="blank">变量参数</a> 功能</span>}>
             Key</Tooltip>
         }]
       },
@@ -604,7 +604,7 @@ class InterfaceColContent extends Component {
     const autoTestsUrl = `/api/open/run_auto_test?id=${this.props.currColId}&token=${this.props.token}${this.state.currColEnv ? '&env_name='+this.state.currColEnv: ''}&mode=${this.state.mode}&email=${this.state.email}`;
     return (
       <div className="interface-col">
-        <h2 className="interface-title" style={{ display: 'inline-block', margin: "0 20px", marginBottom: '16px' }}>测试集合&nbsp;<a target="_blank" rel="noopener noreferrer" href="https://yapi.ymfe.org/documents/case.html" >
+        <h2 className="interface-title" style={{ display: 'inline-block', margin: "0 20px", marginBottom: '16px' }}>测试集合&nbsp;<a target="_blank" rel="noopener noreferrer" href="http://139.129.235.147:3000/doc/documents/case.html" >
           <Tooltip title="点击查看文档"><Icon type="question-circle-o" /></Tooltip>
         </a></h2>
         <div style={{ display: 'inline-block', margin: 0, marginBottom: '16px' }}>

@@ -321,7 +321,7 @@ class ProjectData extends Component {
         <div className="m-panel">
           <div className="postman-dataImport">
             <div className="dataImportCon">
-              <div ><h3>数据导入&nbsp;<a target="_blank" rel="noopener noreferrer" href="https://yapi.ymfe.org/documents/data.html" >
+              <div ><h3>数据导入&nbsp;<a target="_blank" rel="noopener noreferrer" href="http://139.129.235.147:3000/doc/documents/data.html" >
                 <Tooltip title="点击查看文档"><Icon type="question-circle-o" /></Tooltip>
               </a></h3></div>
               <div className="dataImportTile">
