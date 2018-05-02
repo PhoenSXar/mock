@@ -1,16 +1,16 @@
 import axios from 'axios';
 
 // Actions
-const FETCH_GROUP_LIST = 'yapi/group/FETCH_GROUP_LIST';
-const SET_CURR_GROUP = 'yapi/group/SET_CURR_GROUP';
-const FETCH_GROUP_MEMBER = 'yapi/group/FETCH_GROUP_MEMBER';
-const FETCH_GROUP_MSG = 'yapi/group/FETCH_GROUP_MSG';
-const ADD_GROUP_MEMBER = 'yapi/group/ADD_GROUP_MEMBER';
-const DEL_GROUP_MEMBER = 'yapi/group/DEL_GROUP_MEMBER';
-const CHANGE_GROUP_MEMBER = 'yapi/group/CHANGE_GROUP_MEMBER';
-const CHANGE_GROUP_MESSAGE = 'yapi/group/CHANGE_GROUP_MESSAGE';
-const UPDATE_GROUP_LIST = 'yapi/group/UPDATE_GROUP_LIST';
-const DEL_GROUP = 'yapi/group/DEL_GROUP';
+const FETCH_GROUP_LIST = 'mock/group/FETCH_GROUP_LIST';
+const SET_CURR_GROUP = 'mock/group/SET_CURR_GROUP';
+const FETCH_GROUP_MEMBER = 'mock/group/FETCH_GROUP_MEMBER';
+const FETCH_GROUP_MSG = 'mock/group/FETCH_GROUP_MSG';
+const ADD_GROUP_MEMBER = 'mock/group/ADD_GROUP_MEMBER';
+const DEL_GROUP_MEMBER = 'mock/group/DEL_GROUP_MEMBER';
+const CHANGE_GROUP_MEMBER = 'mock/group/CHANGE_GROUP_MEMBER';
+const CHANGE_GROUP_MESSAGE = 'mock/group/CHANGE_GROUP_MESSAGE';
+const UPDATE_GROUP_LIST = 'mock/group/UPDATE_GROUP_LIST';
+const DEL_GROUP = 'mock/group/DEL_GROUP';
 
 // Reducer
 const initialState = {

@@ -1,4 +1,4 @@
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const mongoose = require('mongoose');
 const autoIncrement = require('mongoose-auto-increment');
 
@@ -16,11 +16,11 @@ class baseModel{
                 model: this.name,
                 field: this.getPrimaryKey(),
                 startAt: 11,
-                incrementBy: yapi.commons.rand(1, 10)
+                incrementBy: mock.commons.rand(1, 10)
             });
         }
         
-        this.model = yapi.db(this.name, this.schema);
+        this.model = mock.db(this.name, this.schema);
     }
 
     isNeedAutoIncrement(){
@@ -38,11 +38,11 @@ class baseModel{
      * 获取collection的schema结构
      */
     getSchema(){
-        yapi.commons.log('Model Class need getSchema function', 'error');
+        mock.commons.log('Model Class need getSchema function', 'error');
     }
 
     getName(){
-        yapi.commons.log('Model Class need name', 'error');
+        mock.commons.log('Model Class need name', 'error');
     }
 }
 

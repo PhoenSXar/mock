@@ -6,7 +6,7 @@ const groupModel = require('../models/group.js')
 const _ = require('underscore');
 const url = require('url');
 const baseController = require('./base.js');
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const userModel = require('../models/user.js');
 const projectModel = require('../models/project.js');
 const jsondiffpatch = require('jsondiffpatch')
@@ -23,13 +23,13 @@ const path = require('path');
 class interfaceController extends baseController {
   constructor(ctx) {
     super(ctx);
-    this.Model = yapi.getInst(interfaceModel);
-    this.catModel = yapi.getInst(interfaceCatModel);
-    this.projectModel = yapi.getInst(projectModel);
-    this.caseModel = yapi.getInst(interfaceCaseModel);
-    this.followModel = yapi.getInst(followModel);
-    this.userModel = yapi.getInst(userModel);
-    this.groupModel = yapi.getInst(groupModel);
+    this.Model = mock.getInst(interfaceModel);
+    this.catModel = mock.getInst(interfaceCatModel);
+    this.projectModel = mock.getInst(projectModel);
+    this.caseModel = mock.getInst(interfaceCaseModel);
+    this.followModel = mock.getInst(followModel);
+    this.userModel = mock.getInst(userModel);
+    this.groupModel = mock.getInst(groupModel);
 
     const minLengthStringField = {
       type: 'string',
@@ -140,7 +140,7 @@ class interfaceController extends baseController {
 
     let auth = await this.checkAuth(params.project_id, 'project', 'edit')
     if (!auth) {
-      return ctx.body = yapi.commons.resReturn(null, 40033, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 40033, '没有权限');
     }
     params.method = params.method || 'GET';
     params.res_body_is_json_schema = _.isUndefined (params.res_body_is_json_schema) ? true : params.res_body_is_json_schema;
@@ -150,8 +150,8 @@ class interfaceController extends baseController {
     params.res_body_type = params.res_body_type ? params.res_body_type.toLowerCase() : 'json';
     let http_path = url.parse(params.path, true);
 
-    if (!yapi.commons.verifyPath(http_path.pathname)) {
-      return ctx.body = yapi.commons.resReturn(null, 400, 'path第一位必需为 /, 只允许由 字母数字-/_:.! 组成');
+    if (!mock.commons.verifyPath(http_path.pathname)) {
+      return ctx.body = mock.commons.resReturn(null, 400, 'path第一位必需为 /, 只允许由 字母数字-/_:.! 组成');
     }
 
     params.query_path = {};
@@ -167,17 +167,17 @@ class interfaceController extends baseController {
     let checkRepeat = await this.Model.checkRepeat(params.project_id, params.path, params.method);
 
     if (checkRepeat > 0) {
-      return ctx.body = yapi.commons.resReturn(null, 40022, '已存在的接口:' + params.path + '[' + params.method + ']');
+      return ctx.body = mock.commons.resReturn(null, 40022, '已存在的接口:' + params.path + '[' + params.method + ']');
     }
 
 
     let data = Object.assign(params, {
       uid: this.getUid(),
-      add_time: yapi.commons.time(),
-      up_time: yapi.commons.time()
+      add_time: mock.commons.time(),
+      up_time: mock.commons.time()
     });
 
-    yapi.commons.handleVarPath(params.path, params.req_params);
+    mock.commons.handleVarPath(params.path, params.req_params);
 
     if (params.req_params.length > 0) {
       data.type = 'var'
@@ -188,12 +188,12 @@ class interfaceController extends baseController {
 
 
     let result = await this.Model.save(data);
-    yapi.emitHook('interface_add', result._id).then();
+    mock.emitHook('interface_add', result._id).then();
     this.catModel.get(params.catid).then((cate) => {
       let username = this.getUsername();
       let title = `<a href="/user/profile/${this.getUid()}">${username}</a> 为分类 <a href="/project/${params.project_id}/interface/api/cat_${params.catid}">${cate.name}</a> 添加了接口 <a href="/project/${params.project_id}/interface/api/${result._id}">${data.title}</a> `
 
-      yapi.commons.saveLog({
+      mock.commons.saveLog({
         content: title,
         type: 'project',
         uid: this.getUid(),
@@ -203,7 +203,7 @@ class interfaceController extends baseController {
       this.projectModel.up(params.project_id, { up_time: new Date().getTime() }).then();
     });
 
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
 
   }
 
@@ -240,7 +240,7 @@ class interfaceController extends baseController {
 
     let auth = await this.checkAuth(params.project_id, 'project', 'edit')
     if (!auth) {
-      return ctx.body = yapi.commons.resReturn(null, 40033, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 40033, '没有权限');
     }
     params.method = params.method || 'GET';
     params.method = params.method.toUpperCase();
@@ -248,8 +248,8 @@ class interfaceController extends baseController {
 
     let http_path = url.parse(params.path, true);
 
-    if (!yapi.commons.verifyPath(http_path.pathname)) {
-      return ctx.body = yapi.commons.resReturn(null, 400, 'path第一位必需为 /, 只允许由 字母数字-/_:.! 组成');
+    if (!mock.commons.verifyPath(http_path.pathname)) {
+      return ctx.body = mock.commons.resReturn(null, 400, 'path第一位必需为 /, 只允许由 字母数字-/_:.! 组成');
     }
 
     let result = await this.Model.getByPath(params.project_id, params.path, params.method, '_id');
@@ -258,27 +258,27 @@ class interfaceController extends baseController {
       result.forEach(async item => {
         params.id = item._id;
         // console.log(this.schemaMap['up'])
-        let validResult = yapi.commons.validateParams(this.schemaMap['up'], params);
+        let validResult = mock.commons.validateParams(this.schemaMap['up'], params);
         if (validResult.valid) {
           let data = {};
           data.params = params
           await this.up(data)
         } else {
-          return ctx.body = yapi.commons.resReturn(null, 400, validResult.message);
+          return ctx.body = mock.commons.resReturn(null, 400, validResult.message);
         }
       })
     } else {
-      let validResult = yapi.commons.validateParams(this.schemaMap['add'], params);
+      let validResult = mock.commons.validateParams(this.schemaMap['add'], params);
       if (validResult.valid) {
         let data = {};
         data.params = params
         await this.add(data)
       } else {
-        return ctx.body = yapi.commons.resReturn(null, 400, validResult.message);
+        return ctx.body = mock.commons.resReturn(null, 400, validResult.message);
       }
     }
-    ctx.body = yapi.commons.resReturn(result);
-    // return ctx.body = yapi.commons.resReturn(null, 400, 'path第一位必需为 /, 只允许由 字母数字-/_:.! 组成');
+    ctx.body = mock.commons.resReturn(result);
+    // return ctx.body = mock.commons.resReturn(null, 400, 'path第一位必需为 /, 只允许由 字母数字-/_:.! 组成');
 
   }
 
@@ -295,31 +295,31 @@ class interfaceController extends baseController {
   async get(ctx) {
     let params = ctx.request.query;
     if (!params.id) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '接口id不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '接口id不能为空');
     }
 
     try {
       let result = await this.Model.get(params.id);
       // console.log('result', result);
       if (!result) {
-        return ctx.body = yapi.commons.resReturn(null, 490, '不存在的');
+        return ctx.body = mock.commons.resReturn(null, 490, '不存在的');
       }
       let userinfo = await this.userModel.findById(result.uid);
       let project = await this.projectModel.getBaseInfo(result.project_id);
       if (project.project_type === 'private') {
         if (await this.checkAuth(project._id, 'project', 'view') !== true) {
-          return ctx.body = yapi.commons.resReturn(null, 406, '没有权限');
+          return ctx.body = mock.commons.resReturn(null, 406, '没有权限');
         }
       }
-      yapi.emitHook('interface_get', params.id).then();
+      mock.emitHook('interface_get', params.id).then();
       result = result.toObject();
       if (userinfo) {
         result.username = userinfo.username;
       }
 
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 402, e.message);
+      ctx.body = mock.commons.resReturn(null, 402, e.message);
     }
   }
 
@@ -341,15 +341,15 @@ class interfaceController extends baseController {
     limit = ctx.request.query.limit || 10;
     let project = await this.projectModel.getBaseInfo(project_id);
     if (!project) {
-      return ctx.body = yapi.commons.resReturn(null, 407, '不存在的项目');
+      return ctx.body = mock.commons.resReturn(null, 407, '不存在的项目');
     }
     if (project.project_type === 'private') {
       if (await this.checkAuth(project._id, 'project', 'view') !== true) {
-        return ctx.body = yapi.commons.resReturn(null, 406, '没有权限');
+        return ctx.body = mock.commons.resReturn(null, 406, '没有权限');
       }
     }
     if (!project_id) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '项目id不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '项目id不能为空');
     }
 
     try {
@@ -362,20 +362,20 @@ class interfaceController extends baseController {
       
       let count = await this.Model.listCount({project_id});
       
-      ctx.body = yapi.commons.resReturn({
+      ctx.body = mock.commons.resReturn({
         count: count,
         total: Math.ceil(count / limit),
         list: result
       });
-      yapi.emitHook('interface_list', project_id).then();
+      mock.emitHook('interface_list', project_id).then();
     } catch (err) {
-      ctx.body = yapi.commons.resReturn(null, 402, err.message);
+      ctx.body = mock.commons.resReturn(null, 402, err.message);
     }
   }
 
   async downloadCrx(ctx) {
     let filename = 'crossRequest.zip';
-    let dataBuffer = yapi.fs.readFileSync(yapi.path.join(yapi.WEBROOT, 'static/attachment/cross-request.zip'));
+    let dataBuffer = mock.fs.readFileSync(mock.path.join(mock.WEBROOT, 'static/attachment/cross-request.zip'));
     ctx.set('Content-disposition', 'attachment; filename=' + filename);
     ctx.set('Content-Type', 'application/zip');
     ctx.body = dataBuffer;
@@ -388,7 +388,7 @@ class interfaceController extends baseController {
     limit = ctx.request.query.limit || 10;
    
     if (!catid) {
-      return ctx.body = yapi.commons.resReturn(null, 400, 'catid不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, 'catid不能为空');
     }
     try {
       let catdata = await this.catModel.get(catid);
@@ -396,7 +396,7 @@ class interfaceController extends baseController {
       let project = await this.projectModel.getBaseInfo(catdata.project_id);
       if (project.project_type === 'private') {
         if (await this.checkAuth(project._id, 'project', 'view') !== true) {
-          return ctx.body = yapi.commons.resReturn(null, 406, '没有权限');
+          return ctx.body = mock.commons.resReturn(null, 406, '没有权限');
         }
       }
       
@@ -404,13 +404,13 @@ class interfaceController extends baseController {
 
       let count = await this.Model.listCount({catid});
       
-      ctx.body = yapi.commons.resReturn({
+      ctx.body = mock.commons.resReturn({
         count: count,
         total: Math.ceil(count / limit),
         list: result
       });
     } catch (err) {
-      ctx.body = yapi.commons.resReturn(null, 402, err.message+'1');
+      ctx.body = mock.commons.resReturn(null, 402, err.message+'1');
     }
 
   }
@@ -418,16 +418,16 @@ class interfaceController extends baseController {
   async listByMenu(ctx) {
     let project_id = ctx.request.query.project_id;
     if (!project_id) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '项目id不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '项目id不能为空');
     }
 
     let project = await this.projectModel.getBaseInfo(project_id);
     if (!project) {
-      return ctx.body = yapi.commons.resReturn(null, 406, '不存在的项目');
+      return ctx.body = mock.commons.resReturn(null, 406, '不存在的项目');
     }
     if (project.project_type === 'private') {
       if (await this.checkAuth(project._id, 'project', 'view') !== true) {
-        return ctx.body = yapi.commons.resReturn(null, 406, '没有权限');
+        return ctx.body = mock.commons.resReturn(null, 406, '没有权限');
       }
     }
 
@@ -443,9 +443,9 @@ class interfaceController extends baseController {
         item.list = list;
         newResult[i] = item
       }
-      ctx.body = yapi.commons.resReturn(newResult);
+      ctx.body = mock.commons.resReturn(newResult);
     } catch (err) {
-      ctx.body = yapi.commons.resReturn(null, 402, err.message);
+      ctx.body = mock.commons.resReturn(null, 402, err.message);
     }
 
   }
@@ -493,22 +493,22 @@ class interfaceController extends baseController {
 
     let interfaceData = await this.Model.get(id);
     if (!interfaceData) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '不存在的接口');
+      return ctx.body = mock.commons.resReturn(null, 400, '不存在的接口');
     }
     let auth = await this.checkAuth(interfaceData.project_id, 'project', 'edit')
     if (!auth) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 400, '没有权限');
     }
 
     let data = Object.assign({
-      up_time: yapi.commons.time()
+      up_time: mock.commons.time()
     }, params);
 
     if (params.path) {
       let http_path = url.parse(params.path, true);
 
-      if (!yapi.commons.verifyPath(http_path.pathname)) {
-        return ctx.body = yapi.commons.resReturn(null, 400, 'path第一位必需为 /, 只允许由 字母数字-/_:.! 组成');
+      if (!mock.commons.verifyPath(http_path.pathname)) {
+        return ctx.body = mock.commons.resReturn(null, 400, 'path第一位必需为 /, 只允许由 字母数字-/_:.! 组成');
       }
       params.query_path = {};
       params.query_path.path = http_path.pathname;
@@ -526,7 +526,7 @@ class interfaceController extends baseController {
     if (params.path && (params.path !== interfaceData.path || params.method !== interfaceData.method)) {
       let checkRepeat = await this.Model.checkRepeat(interfaceData.project_id, params.path, params.method);
       if (checkRepeat > 0) {
-        return ctx.body = yapi.commons.resReturn(null, 401, '已存在的接口:' + params.path + '[' + params.method + ']');
+        return ctx.body = mock.commons.resReturn(null, 401, '已存在的接口:' + params.path + '[' + params.method + ']');
       }
     }
 
@@ -550,7 +550,7 @@ class interfaceController extends baseController {
     }
 
     this.catModel.get(interfaceData.catid).then((cate) => {
-      yapi.commons.saveLog({
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 
                     更新了分类 <a href="/project/${cate.project_id}/interface/api/cat_${data.catid}">${cate.name}</a> 
                     下的接口 <a href="/project/${cate.project_id}/interface/api/${id}">${interfaceData.title}</a><p>${params.message}</p>`,
@@ -567,8 +567,8 @@ class interfaceController extends baseController {
     if (params.switch_notice === true) {
       let diffView = showDiffMsg(jsondiffpatch, formattersHtml, logData);
 
-      let annotatedCss = fs.readFileSync(path.resolve(yapi.WEBROOT, 'node_modules/jsondiffpatch/public/formatters-styles/annotated.css'), 'utf8');
-      let htmlCss = fs.readFileSync(path.resolve(yapi.WEBROOT, 'node_modules/jsondiffpatch/public/formatters-styles/html.css'), 'utf8');
+      let annotatedCss = fs.readFileSync(path.resolve(mock.WEBROOT, 'node_modules/jsondiffpatch/public/formatters-styles/annotated.css'), 'utf8');
+      let htmlCss = fs.readFileSync(path.resolve(mock.WEBROOT, 'node_modules/jsondiffpatch/public/formatters-styles/html.css'), 'utf8');
 
       let project = await this.projectModel.getBaseInfo(interfaceData.project_id);
       let interfaceUrl = `http://${ctx.request.host}/project/${interfaceData.project_id}/interface/api/${id}`
@@ -593,8 +593,8 @@ class interfaceController extends baseController {
       })
     }
 
-    yapi.emitHook('interface_update', id).then();
-    ctx.body = yapi.commons.resReturn(result);
+    mock.emitHook('interface_update', id).then();
+    ctx.body = mock.commons.resReturn(result);
     return 1;
   }
 
@@ -627,7 +627,7 @@ class interfaceController extends baseController {
       let id = ctx.request.body.id;
 
       if (!id) {
-        return ctx.body = yapi.commons.resReturn(null, 400, '接口id不能为空');
+        return ctx.body = mock.commons.resReturn(null, 400, '接口id不能为空');
       }
 
       let data = await this.Model.get(ctx.request.body.id);
@@ -635,17 +635,17 @@ class interfaceController extends baseController {
       if (data.uid != this.getUid()) {
         let auth = await this.checkAuth(data.project_id, 'project', 'danger')
         if (!auth) {
-          return ctx.body = yapi.commons.resReturn(null, 400, '没有权限');
+          return ctx.body = mock.commons.resReturn(null, 400, '没有权限');
         }
       }
 
       let inter = await this.Model.get(id);
       let result = await this.Model.del(id);
-      yapi.emitHook('interface_del', id).then();
+      mock.emitHook('interface_del', id).then();
       await this.caseModel.delByInterfaceId(id);
       let username = this.getUsername();
       this.catModel.get(inter.catid).then((cate) => {
-        yapi.commons.saveLog({
+        mock.commons.saveLog({
           content: `<a href="/user/profile/${this.getUid()}">${username}</a> 删除了分类 <a href="/project/${cate.project_id}/interface/api/cat_${inter.catid}">${cate.name}</a> 下的接口 "${inter.title}"`,
           type: 'project',
           uid: this.getUid(),
@@ -654,9 +654,9 @@ class interfaceController extends baseController {
         });
       })
       this.projectModel.up(data.project_id, { up_time: new Date().getTime() }).then();
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
     } catch (err) {
-      ctx.body = yapi.commons.resReturn(null, 402, err.message);
+      ctx.body = mock.commons.resReturn(null, 402, err.message);
     }
   }
 
@@ -667,7 +667,7 @@ class interfaceController extends baseController {
       result = await this.Model.get(id);
 
       if (result.edit_uid !== 0 && result.edit_uid !== this.getUid()) {
-        userInst = yapi.getInst(userModel);
+        userInst = mock.getInst(userModel);
         userinfo = await userInst.findById(result.edit_uid);
         data = {
           errno: result.edit_uid,
@@ -685,29 +685,29 @@ class interfaceController extends baseController {
         this.Model.upEditUid(id, 0).then()
       })
     } catch (err) {
-      yapi.commons.log(err, 'error')
+      mock.commons.log(err, 'error')
     }
   }
 
   async addCat(ctx) {
     try {
       let params = ctx.request.body;
-      params = yapi.commons.handleParams(params, {
+      params = mock.commons.handleParams(params, {
         name: 'string',
         project_id: 'number',
         desc: 'string'
       });
 
       if (!params.project_id) {
-        return ctx.body = yapi.commons.resReturn(null, 400, '项目id不能为空');
+        return ctx.body = mock.commons.resReturn(null, 400, '项目id不能为空');
       }
 
       let auth = await this.checkAuth(params.project_id, 'project', 'edit')
       if (!auth) {
-        return ctx.body = yapi.commons.resReturn(null, 400, '没有权限');
+        return ctx.body = mock.commons.resReturn(null, 400, '没有权限');
       }
       if (!params.name) {
-        return ctx.body = yapi.commons.resReturn(null, 400, '名称不能为空');
+        return ctx.body = mock.commons.resReturn(null, 400, '名称不能为空');
       }
 
 
@@ -716,12 +716,12 @@ class interfaceController extends baseController {
         project_id: params.project_id,
         desc: params.desc,
         uid: this.getUid(),
-        add_time: yapi.commons.time(),
-        up_time: yapi.commons.time()
+        add_time: mock.commons.time(),
+        up_time: mock.commons.time()
       })
 
       let username = this.getUsername();
-      yapi.commons.saveLog({
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 添加了分类  <a href="/project/${params.project_id}/interface/api/cat_${result._id}">${params.name}</a>`,
         type: 'project',
         uid: this.getUid(),
@@ -729,10 +729,10 @@ class interfaceController extends baseController {
         typeid: params.project_id
       });
 
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
 
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 402, e.message);
+      ctx.body = mock.commons.resReturn(null, 402, e.message);
     }
   }
 
@@ -742,7 +742,7 @@ class interfaceController extends baseController {
       let result = await this.catModel.up(params.catid, {
         name: params.name,
         desc: params.desc,
-        up_time: yapi.commons.time()
+        up_time: mock.commons.time()
       });
 
       let username = this.getUsername();
@@ -750,9 +750,9 @@ class interfaceController extends baseController {
 
       let auth = await this.checkAuth(cate.project_id, 'project', 'edit')
       if (!auth) {
-        return ctx.body = yapi.commons.resReturn(null, 400, '没有权限');
+        return ctx.body = mock.commons.resReturn(null, 400, '没有权限');
       }
-      yapi.commons.saveLog({
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 更新了分类 <a href="/project/${cate.project_id}/interface/api/cat_${params.catid}">${cate.name}</a>`,
         type: 'project',
         uid: this.getUid(),
@@ -760,9 +760,9 @@ class interfaceController extends baseController {
         typeid: cate.project_id
       });
 
-      ctx.body = yapi.commons.resReturn(result)
+      ctx.body = mock.commons.resReturn(result)
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 400, e.message)
+      ctx.body = mock.commons.resReturn(null, 400, e.message)
     }
   }
 
@@ -771,18 +771,18 @@ class interfaceController extends baseController {
       let id = ctx.request.body.catid;
       let catData = await this.catModel.get(id);
       if (!catData) {
-        ctx.body = yapi.commons.resReturn(null, 400, "不存在的分类")
+        ctx.body = mock.commons.resReturn(null, 400, "不存在的分类")
       }
 
       if (catData.uid !== this.getUid()) {
         let auth = await this.checkAuth(catData.project_id, 'project', 'danger')
         if (!auth) {
-          return ctx.body = yapi.commons.resReturn(null, 400, '没有权限');
+          return ctx.body = mock.commons.resReturn(null, 400, '没有权限');
         }
       }
 
       let username = this.getUsername();
-      yapi.commons.saveLog({
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 删除了分类 "${catData.name}" 及该分类下的接口`,
         type: 'project',
         uid: this.getUid(),
@@ -793,18 +793,18 @@ class interfaceController extends baseController {
       let interfaceData = await this.Model.listByCatid(id);
       interfaceData.forEach(async item => {
         try {
-          yapi.emitHook('interface_del', item._id).then();
+          mock.emitHook('interface_del', item._id).then();
           await this.caseModel.delByInterfaceId(item._id);
         } catch (e) {
-          yapi.commons.log(e.message, 'error');
+          mock.commons.log(e.message, 'error');
         }
 
       })
       await this.catModel.del(id);
       let r = await this.Model.delByCatid(id);
-      return ctx.body = yapi.commons.resReturn(r);
+      return ctx.body = mock.commons.resReturn(r);
     } catch (e) {
-      yapi.commons.resReturn(null, 400, e.message)
+      mock.commons.resReturn(null, 400, e.message)
     }
   }
 
@@ -824,20 +824,20 @@ class interfaceController extends baseController {
     let project_id = ctx.request.query.project_id;
 
     if (!project_id || isNaN(project_id)) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '项目id不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '项目id不能为空');
     }
 
     try {
       let project = await this.projectModel.getBaseInfo(project_id);
       if (project.project_type === 'private') {
         if (await this.checkAuth(project._id, 'project', 'edit') !== true) {
-          return ctx.body = yapi.commons.resReturn(null, 406, '没有权限');
+          return ctx.body = mock.commons.resReturn(null, 406, '没有权限');
         }
       }
       let res = await this.catModel.list(project_id);
-      return ctx.body = yapi.commons.resReturn(res);
+      return ctx.body = mock.commons.resReturn(res);
     } catch (e) {
-      yapi.commons.resReturn(null, 400, e.message);
+      mock.commons.resReturn(null, 400, e.message);
     }
   }
 
@@ -855,7 +855,7 @@ class interfaceController extends baseController {
     let params = ctx.request.query
 
     if (Object.keys(params).length !== 1) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '参数数量错误');
+      return ctx.body = mock.commons.resReturn(null, 400, '参数数量错误');
     }
     let customFieldName = Object.keys(params)[0];
     let customFieldValue = params[customFieldName];
@@ -865,7 +865,7 @@ class interfaceController extends baseController {
       //  查找有customFieldName的分组（group）
       let groups = await this.groupModel.getcustomFieldName(customFieldName)
       if (groups.length === 0) {
-        return ctx.body = yapi.commons.resReturn(null, 404, '没有找到对应自定义接口');
+        return ctx.body = mock.commons.resReturn(null, 404, '没有找到对应自定义接口');
       }
 
       // 在每个分组（group）下查找对应project的id值
@@ -882,8 +882,8 @@ class interfaceController extends baseController {
             data.project_id = projects[j]._id;
             inter = inter.map((item, i) => {
               item = inter[i] = inter[i].toObject();
-              item.res_body = yapi.commons.json_parse(item.res_body)
-              item.req_body_other = yapi.commons.json_parse(item.req_body_other)
+              item.res_body = mock.commons.json_parse(item.res_body)
+              item.req_body_other = mock.commons.json_parse(item.req_body_other)
 
               return item
             })
@@ -893,9 +893,9 @@ class interfaceController extends baseController {
           }
         }
       }
-      return ctx.body = yapi.commons.resReturn(interfaces);
+      return ctx.body = mock.commons.resReturn(interfaces);
     } catch (e) {
-      yapi.commons.resReturn(null, 400, e.message);
+      mock.commons.resReturn(null, 400, e.message);
     }
   }
 
@@ -912,13 +912,13 @@ class interfaceController extends baseController {
     const emails = usersInfo.map(item => item.email).join(',');
 
     try {
-      yapi.commons.sendMail({
+      mock.commons.sendMail({
         to: emails,
         contents: data.content,
         subject: data.title
       })
     } catch (e) {
-      yapi.commons.log('邮件发送失败：' + e, 'error')
+      mock.commons.log('邮件发送失败：' + e, 'error')
     }
 
   }
@@ -954,20 +954,20 @@ class interfaceController extends baseController {
     try {
       let params = ctx.request.body;
       if (!params || !Array.isArray(params)) {
-        ctx.body = yapi.commons.resReturn(null, 400, "请求参数必须是数组")
+        ctx.body = mock.commons.resReturn(null, 400, "请求参数必须是数组")
       }
       params.forEach((item) => {
         if (item.id) {
           this.Model.upIndex(item.id, item.index).then((res) => { }, (err) => {
-            yapi.commons.log(err.message, 'error')
+            mock.commons.log(err.message, 'error')
           })
         }
 
       });
 
-      return ctx.body = yapi.commons.resReturn('成功！')
+      return ctx.body = mock.commons.resReturn('成功！')
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 400, e.message)
+      ctx.body = mock.commons.resReturn(null, 400, e.message)
     }
   }
 
@@ -986,20 +986,20 @@ class interfaceController extends baseController {
     try {
       let params = ctx.request.body;
       if (!params || !Array.isArray(params)) {
-        ctx.body = yapi.commons.resReturn(null, 400, "请求参数必须是数组")
+        ctx.body = mock.commons.resReturn(null, 400, "请求参数必须是数组")
       }
       params.forEach((item) => {
         if (item.id) {
           this.catModel.upCatIndex(item.id, item.index).then((res) => { }, (err) => {
-            yapi.commons.log(err.message, 'error')
+            mock.commons.log(err.message, 'error')
           })
         }
 
       });
 
-      return ctx.body = yapi.commons.resReturn('成功！')
+      return ctx.body = mock.commons.resReturn('成功！')
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 400, e.message)
+      ctx.body = mock.commons.resReturn(null, 400, e.message)
     }
   }
 
@@ -1007,7 +1007,7 @@ class interfaceController extends baseController {
     let schema = ctx.request.body.schema;
     let required = ctx.request.body.required;
 
-    let res = yapi.commons.schemaToJson(schema, {
+    let res = mock.commons.schemaToJson(schema, {
       alwaysFakeOptionals: required ? true : false
     })
     return ctx.body = res; 
@@ -1019,16 +1019,16 @@ class interfaceController extends baseController {
     let project_id = ctx.request.query.project_id;
     
     if (!project_id) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '项目id不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '项目id不能为空');
     }
 
     let project = await this.projectModel.getBaseInfo(project_id);
     if (!project) {
-      return ctx.body = yapi.commons.resReturn(null, 406, '不存在的项目');
+      return ctx.body = mock.commons.resReturn(null, 406, '不存在的项目');
     }
     if (project.project_type === 'private') {
       if (await this.checkAuth(project._id, 'project', 'view') !== true) {
-        return ctx.body = yapi.commons.resReturn(null, 406, '没有权限');
+        return ctx.body = mock.commons.resReturn(null, 406, '没有权限');
       }
     }
 
@@ -1048,10 +1048,10 @@ class interfaceController extends baseController {
         newResult = [].concat(newResult, list)
       }
    
-    ctx.body = yapi.commons.resReturn(newResult);
+    ctx.body = mock.commons.resReturn(newResult);
 
     } catch (err) {
-      ctx.body = yapi.commons.resReturn(null, 402, err.message);
+      ctx.body = mock.commons.resReturn(null, 402, err.message);
     }
 
   }

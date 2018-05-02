@@ -16,5 +16,5 @@ ReactDOM.render(
       <App />
     </div>
   </Provider>,
-  document.getElementById('yapi')
+  document.getElementById('mock')
 )

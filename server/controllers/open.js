@@ -5,7 +5,7 @@ const interfaceModel = require('../models/interface.js');
 const tokenModel = require('../models/token.js');
 const followModel = require('../models/follow.js');
 const userModel = require('../models/user.js')
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseController = require('./base.js');
 const { handleParams, crossRequest, handleCurrDomain, checkNameIsExistInArray } = require('../../common/postmanLib')
 const {handleParamsValue} = require('../../common/utils.js')
@@ -14,13 +14,13 @@ const renderToHtml = require('../utils/reportHtml')
 class openController extends baseController{
   constructor(ctx){
     super(ctx)
-    this.projectModel = yapi.getInst(projectModel)
-    this.interfaceColModel = yapi.getInst(interfaceColModel)
-    this.interfaceCaseModel = yapi.getInst(interfaceCaseModel)
-    this.interfaceModel = yapi.getInst(interfaceModel)
-    this.tokenModel = yapi.getInst(tokenModel);
-    this.followModel = yapi.getInst(followModel);
-    this.userModel = yapi.getInst(userModel)
+    this.projectModel = mock.getInst(projectModel)
+    this.interfaceColModel = mock.getInst(interfaceColModel)
+    this.interfaceCaseModel = mock.getInst(interfaceCaseModel)
+    this.interfaceModel = mock.getInst(interfaceModel)
+    this.tokenModel = mock.getInst(tokenModel);
+    this.followModel = mock.getInst(followModel);
+    this.userModel = mock.getInst(userModel)
     this.handleValue = this.handleValue.bind(this)
     this.schemaMap = {
       runAutoTest: {
@@ -64,22 +64,22 @@ class openController extends baseController{
     let curEnv = ctx.params.env_name;
     let colData = await this.interfaceColModel.get(id);
     if(!colData){
-      return ctx.body = yapi.commons.resReturn(null, 40022, 'id值不存在');
+      return ctx.body = mock.commons.resReturn(null, 40022, 'id值不存在');
     }
 
     if(!token){
-      return ctx.body = yapi.commons.resReturn(null, 40033, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 40033, '没有权限');
     }
     
     let checkId = await this.getProjectIdByToken(token);
     
     let projectId = colData.project_id;
     if(checkId !== projectId){
-      return ctx.body = yapi.commons.resReturn(null, 40033, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 40033, '没有权限');
     }
     let projectData = await this.projectModel.get(projectId);
     
-    let caseList = await yapi.commons.getCaseList(id);
+    let caseList = await mock.commons.getCaseList(id);
     if(caseList.errcode !== 0){
       ctx.body = caseList
     }
@@ -247,13 +247,13 @@ class openController extends baseController{
     const emails = usersInfo.map(item => item.email).join(',');
 
     try {
-      yapi.commons.sendMail({
+      mock.commons.sendMail({
         to: emails,
         contents: data.content,
         subject: data.title
       })
     } catch (e) {
-      yapi.commons.log('邮件发送失败：' + e, 'error')
+      mock.commons.log('邮件发送失败：' + e, 'error')
     }
 
   }
@@ -274,7 +274,7 @@ class openController extends baseController{
       return null;
     }
     try {
-      let test = await yapi.commons.runCaseScript({
+      let test = await mock.commons.runCaseScript({
         response: response,
         records: this.records,
         script: interfaceData.test_script,

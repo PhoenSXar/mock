@@ -1,6 +1,6 @@
 const fs = require("fs-extra");
 const path = require("path");
-const yapi = require("../yapi.js");
+const mock = require("../mock.js");
 const sha1 = require("sha1");
 const logModel = require("../models/log.js");
 const projectModel = require("../models/project.js");
@@ -90,7 +90,7 @@ exports.log = (msg, type) => {
   let year = date.getFullYear();
   let month = date.getMonth() + 1;
 
-  let logfile = path.join(yapi.WEBROOT_LOG, year + "-" + month + ".log");
+  let logfile = path.join(mock.WEBROOT_LOG, year + "-" + month + ".log");
 
   if (typeof msg === "object") {
     if (msg instanceof Error) msg = msg.message;
@@ -171,7 +171,7 @@ exports.expireDate = day => {
 };
 
 exports.sendMail = (options, cb) => {
-  if (!yapi.mail) return false;
+  if (!mock.mail) return false;
   options.subject = options.subject
     ? options.subject + "-Lemonce Mock Server"
     : "Lemonce Mock Server";
@@ -180,19 +180,19 @@ exports.sendMail = (options, cb) => {
     cb ||
     function(err) {
       if (err) {
-        yapi.commons.log(
+        mock.commons.log(
           "send mail " + options.to + " error," + err.message,
           "error"
         );
       } else {
-        yapi.commons.log("send mail " + options.to + " success");
+        mock.commons.log("send mail " + options.to + " success");
       }
     };
 
   try {
-    yapi.mail.sendMail(
+    mock.mail.sendMail(
       {
-        from: yapi.WEBCONFIG.mail.from,
+        from: mock.WEBCONFIG.mail.from,
         to: options.to,
         subject: options.subject,
         html: options.contents
@@ -200,7 +200,7 @@ exports.sendMail = (options, cb) => {
       cb
     );
   } catch (e) {
-    yapi.commons.log(e.message, "error");
+    mock.commons.log(e.message, "error");
     console.error(e.message); // eslint-disable-line
   }
 };
@@ -376,7 +376,7 @@ exports.validateParams = (schema, params) => {
 
 exports.saveLog = logData => {
   try {
-    let logInst = yapi.getInst(logModel);
+    let logInst = mock.getInst(logModel);
     let data = {
       content: logData.content,
       type: logData.type,
@@ -387,7 +387,7 @@ exports.saveLog = logData => {
     };
     logInst.save(data).then();
   } catch (e) {
-    yapi.commons.log(e, "error"); // eslint-disable-line
+    mock.commons.log(e, "error"); // eslint-disable-line
   }
 };
 
@@ -425,13 +425,13 @@ exports.createAction = (
           ctx.request.body,
           ctx.params
         );
-        let validResult = yapi.commons.validateParams(
+        let validResult = mock.commons.validateParams(
           inst.schemaMap[action],
           ctx.params
         );
 
         if (!validResult.valid) {
-          return (ctx.body = yapi.commons.resReturn(
+          return (ctx.body = mock.commons.resReturn(
             null,
             400,
             validResult.message
@@ -444,12 +444,12 @@ exports.createAction = (
         if (ws === true) {
           ctx.ws.send("请登录...");
         } else {
-          ctx.body = yapi.commons.resReturn(null, 40011, "请登录...");
+          ctx.body = mock.commons.resReturn(null, 40011, "请登录...");
         }
       }
     } catch (err) {
-      ctx.body = yapi.commons.resReturn(null, 40011, "服务器出错...");
-      yapi.commons.log(err, "error");
+      ctx.body = mock.commons.resReturn(null, 40011, "服务器出错...");
+      mock.commons.log(err, "error");
     }
   });
 };
@@ -483,10 +483,10 @@ function handleParamsValue(params, val) {
 exports.handleParamsValue = handleParamsValue;
 
 exports.getCaseList = async function getCaseList(id) {
-  const caseInst = yapi.getInst(interfaceCaseModel);
-  const colInst = yapi.getInst(interfaceColModel);
-  const projectInst = yapi.getInst(projectModel);
-  const interfaceInst = yapi.getInst(interfaceModel);
+  const caseInst = mock.getInst(interfaceCaseModel);
+  const colInst = mock.getInst(interfaceColModel);
+  const projectInst = mock.getInst(projectModel);
+  const interfaceInst = mock.getInst(interfaceModel);
 
   let resultList = await caseInst.list(id, "all");
   let colData = await colInst.get(id);
@@ -518,7 +518,7 @@ exports.getCaseList = async function getCaseList(id) {
   resultList = resultList.sort((a, b) => {
     return a.index - b.index;
   });
-  let ctxBody = yapi.commons.resReturn(resultList);
+  let ctxBody = mock.commons.resReturn(resultList);
   ctxBody.colData = colData;
   return ctxBody;
 };
@@ -537,7 +537,7 @@ function convertString(variable) {
 exports.runCaseScript = async function runCaseScript(params) {
   let script = params.script;
   if (!script) {
-    return yapi.commons.resReturn("ok");
+    return mock.commons.resReturn("ok");
   }
   const logs = [];
   const context = {
@@ -554,12 +554,12 @@ exports.runCaseScript = async function runCaseScript(params) {
 
   let result = {};
   try {
-    result = yapi.commons.sandbox(context, script);
+    result = mock.commons.sandbox(context, script);
     result.logs = logs;
-    return yapi.commons.resReturn(result);
+    return mock.commons.resReturn(result);
   } catch (err) {
     logs.push(convertString(err));
     result.logs = logs;
-    return yapi.commons.resReturn(result, 400, err.name + ": " + err.message);
+    return mock.commons.resReturn(result, 400, err.name + ": " + err.message);
   }
 };

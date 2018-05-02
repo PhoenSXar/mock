@@ -1,5 +1,5 @@
 // Actions
-const CHANGE_MENU_ITEM = 'yapi/menu/CHANGE_MENU_ITEM';
+const CHANGE_MENU_ITEM = 'mock/menu/CHANGE_MENU_ITEM';
 
 // Reducer
 const initialState = {

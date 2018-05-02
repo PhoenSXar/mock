@@ -1,4 +1,4 @@
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseModel = require('./base.js');
 
 class interfaceCol extends baseModel {
@@ -55,7 +55,7 @@ class interfaceCol extends baseModel {
     }
 
     up(id, data) {
-        data.up_time = yapi.commons.time()
+        data.up_time = mock.commons.time()
         return this.model.update(
             {
                 _id: id

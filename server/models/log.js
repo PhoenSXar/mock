@@ -1,4 +1,4 @@
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseModel = require('./base.js');
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
@@ -35,7 +35,7 @@ class logModel extends baseModel {
             uid: data.uid,
             username: data.username,
             typeid: data.typeid,
-            add_time: yapi.commons.time(),
+            add_time: mock.commons.time(),
             data: data.data
         };
 

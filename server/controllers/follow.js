@@ -1,4 +1,4 @@
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseController = require('./base.js');
 const followModel = require('../models/follow');
 const projectModel = require('../models/project');
@@ -6,8 +6,8 @@ const projectModel = require('../models/project');
 class followController extends baseController {
     constructor(ctx) {
         super(ctx);
-        this.Model = yapi.getInst(followModel);
-        this.projectModel = yapi.getInst(projectModel);
+        this.Model = mock.getInst(followModel);
+        this.projectModel = mock.getInst(projectModel);
     }
 
     /**
@@ -29,17 +29,17 @@ class followController extends baseController {
         // limit = ctx.request.query.limit || 10;
 
         if (!uid) {
-            return ctx.body = yapi.commons.resReturn(null, 400, '用户id不能为空');
+            return ctx.body = mock.commons.resReturn(null, 400, '用户id不能为空');
         }
 
         try {
             let result = await this.Model.list(uid);
 
-            ctx.body = yapi.commons.resReturn({
+            ctx.body = mock.commons.resReturn({
                 list: result
             });
         } catch (err) {
-            ctx.body = yapi.commons.resReturn(null, 402, err.message);
+            ctx.body = mock.commons.resReturn(null, 402, err.message);
         }
     }
 
@@ -59,20 +59,20 @@ class followController extends baseController {
         let params = ctx.request.body, uid = this.getUid();
 
         if(!params.projectid){
-            return ctx.body = yapi.commons.resReturn(null, 400, '项目id不能为空');
+            return ctx.body = mock.commons.resReturn(null, 400, '项目id不能为空');
         }
 
         let checkRepeat = await this.Model.checkProjectRepeat(uid,params.projectid);
 
         if (checkRepeat == 0) {
-            return ctx.body = yapi.commons.resReturn(null, 401, '项目未关注');
+            return ctx.body = mock.commons.resReturn(null, 401, '项目未关注');
         }
 
         try {
             let result = await this.Model.del(params.projectid, this.getUid());
-            ctx.body = yapi.commons.resReturn(result);
+            ctx.body = mock.commons.resReturn(result);
         } catch (e) {
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 
@@ -91,20 +91,20 @@ class followController extends baseController {
 
     async add(ctx) {
         let params = ctx.request.body;
-        params = yapi.commons.handleParams(params, {
+        params = mock.commons.handleParams(params, {
             projectid: 'number'
         });
 
         let uid = this.getUid();
 
         if (!params.projectid) {
-            return ctx.body = yapi.commons.resReturn(null, 400, '项目id不能为空');
+            return ctx.body = mock.commons.resReturn(null, 400, '项目id不能为空');
         }
 
         let checkRepeat = await this.Model.checkProjectRepeat(uid,params.projectid);
 
         if (checkRepeat) {
-            return ctx.body = yapi.commons.resReturn(null, 401, '项目已关注');
+            return ctx.body = mock.commons.resReturn(null, 401, '项目已关注');
         }
 
         try {
@@ -117,10 +117,10 @@ class followController extends baseController {
                 color: project.color
             };
             let result = await this.Model.save(data);
-            result = yapi.commons.fieldSelect(result, ['_id', 'uid', 'projectid', 'projectname', 'icon', 'color']);
-            ctx.body = yapi.commons.resReturn(result);
+            result = mock.commons.fieldSelect(result, ['_id', 'uid', 'projectid', 'projectname', 'icon', 'color']);
+            ctx.body = mock.commons.resReturn(result);
         } catch (e) {
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 

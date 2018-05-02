@@ -3,9 +3,9 @@ const _ = require('underscore');
 function getPluginConfig(name, type) {
   let pluginConfig;
   if (type === 'ext') {
-    pluginConfig = require('../exts/yapi-plugin-' + name);
+    pluginConfig = require('../exts/mock-plugin-' + name);
   } else {
-    pluginConfig = require('yapi-plugin-' + name);
+    pluginConfig = require('mock-plugin-' + name);
   }
 
   if (!pluginConfig || typeof pluginConfig !== 'object') {

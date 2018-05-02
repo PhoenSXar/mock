@@ -1,5 +1,5 @@
 const projectModel = require('../models/project.js');
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const _ = require("underscore");
 const baseController = require('./base.js');
 const interfaceModel = require('../models/interface.js');
@@ -19,11 +19,11 @@ class projectController extends baseController {
 
   constructor(ctx) {
     super(ctx);
-    this.Model = yapi.getInst(projectModel);
-    this.groupModel = yapi.getInst(groupModel);
-    this.logModel = yapi.getInst(logModel);
-    this.followModel = yapi.getInst(followModel);
-    this.tokenModel = yapi.getInst(tokenModel);
+    this.Model = mock.getInst(projectModel);
+    this.groupModel = mock.getInst(groupModel);
+    this.logModel = mock.getInst(logModel);
+    this.followModel = mock.getInst(followModel);
+    this.tokenModel = mock.getInst(tokenModel);
 
     const id = 'number';
     const member_uid = ['number'];
@@ -136,20 +136,20 @@ class projectController extends baseController {
     let params = ctx.params;
 
     if (await this.checkAuth(params.group_id, 'group', 'edit') !== true) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
     }
 
 
     let checkRepeat = await this.Model.checkNameRepeat(params.name, params.group_id);
 
     if (checkRepeat > 0) {
-      return ctx.body = yapi.commons.resReturn(null, 401, '已存在的项目名');
+      return ctx.body = mock.commons.resReturn(null, 401, '已存在的项目名');
     }
 
     params.basepath = params.basepath || '';
 
     if ((params.basepath = this.handleBasepath(params.basepath)) === false) {
-      return ctx.body = yapi.commons.resReturn(null, 401, 'basepath格式有误');
+      return ctx.body = mock.commons.resReturn(null, 401, 'basepath格式有误');
     }
 
     let data = {
@@ -163,30 +163,30 @@ class projectController extends baseController {
       group_name: params.group_name,
       icon: params.icon,
       color: params.color,
-      add_time: yapi.commons.time(),
-      up_time: yapi.commons.time(),
+      add_time: mock.commons.time(),
+      up_time: mock.commons.time(),
       env: [{ name: 'local', domain: 'http://127.0.0.1' }]
     };
 
     let result = await this.Model.save(data);
-    let colInst = yapi.getInst(interfaceColModel);
-    let catInst = yapi.getInst(interfaceCatModel);
+    let colInst = mock.getInst(interfaceColModel);
+    let catInst = mock.getInst(interfaceCatModel);
     if (result._id) {
       await colInst.save({
         name: '公共测试集',
         project_id: result._id,
         desc: '公共测试集',
         uid: this.getUid(),
-        add_time: yapi.commons.time(),
-        up_time: yapi.commons.time()
+        add_time: mock.commons.time(),
+        up_time: mock.commons.time()
       })
       await catInst.save({
         name: '公共分类',
         project_id: result._id,
         desc: '公共分类',
         uid: this.getUid(),
-        add_time: yapi.commons.time(),
-        up_time: yapi.commons.time()
+        add_time: mock.commons.time(),
+        up_time: mock.commons.time()
       })
     }
     let uid = this.getUid();
@@ -197,14 +197,14 @@ class projectController extends baseController {
 
     }
     let username = this.getUsername();
-    yapi.commons.saveLog({
+    mock.commons.saveLog({
       content: `<a href="/user/profile/${this.getUid()}">${username}</a> 添加了项目 <a href="/project/${result._id}">${params.name}</a>`,
       type: 'project',
       uid,
       username: username,
       typeid: result._id
     });
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
   }
 
 
@@ -224,7 +224,7 @@ class projectController extends baseController {
   async addMember(ctx) {
     let params = ctx.params;
     if (await this.checkAuth(params.id, 'project', 'edit') !== true) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
     }
 
     params.role = ['owner', 'dev', 'guest'].find(v => v === params.role) || 'dev';
@@ -251,7 +251,7 @@ class projectController extends baseController {
       })
       members = members.join("、");
       let username = this.getUsername();
-      yapi.commons.saveLog({
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 添加了项目成员 ${members}`,
         type: 'project',
         uid: this.getUid(),
@@ -259,7 +259,7 @@ class projectController extends baseController {
         typeid: params.id
       });
     }
-    ctx.body = yapi.commons.resReturn({
+    ctx.body = mock.commons.resReturn({
       result,
       add_members,
       exist_members,
@@ -284,17 +284,17 @@ class projectController extends baseController {
 
     var check = await this.Model.checkMemberRepeat(params.id, params.member_uid);
     if (check === 0) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '项目成员不存在');
+      return ctx.body = mock.commons.resReturn(null, 400, '项目成员不存在');
     }
 
     if (await this.checkAuth(params.id, 'project', 'danger') !== true) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
     }
 
     let result = await this.Model.delMember(params.id, params.member_uid);
     let username = this.getUsername();
-    yapi.getInst(userModel).findById(params.member_uid).then((member) => {
-      yapi.commons.saveLog({
+    mock.getInst(userModel).findById(params.member_uid).then((member) => {
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 删除了项目中的成员 <a href="/user/profile/${params.member_uid}">${member.username}</a>`,
         type: 'project',
         uid: this.getUid(),
@@ -302,14 +302,14 @@ class projectController extends baseController {
         typeid: params.id
       });
     });
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
 
   }
 
 
   async getUserdata(uid, role) {
     role = role || 'dev';
-    let userInst = yapi.getInst(userModel);
+    let userInst = mock.getInst(userModel);
     let userData = await userInst.findById(uid);
     if (!userData) {
       return null;
@@ -336,11 +336,11 @@ class projectController extends baseController {
   async getMemberList(ctx) {
     let params = ctx.params;
     if (!params.id) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '项目id不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '项目id不能为空');
     }
 
     let project = await this.Model.get(params.id);
-    ctx.body = yapi.commons.resReturn(project.members);
+    ctx.body = mock.commons.resReturn(project.members);
 
   }
 
@@ -360,15 +360,15 @@ class projectController extends baseController {
     let result = await this.Model.getBaseInfo(params.id);
 
     if (!result) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '不存在的项目');
+      return ctx.body = mock.commons.resReturn(null, 400, '不存在的项目');
     }
     if (result.project_type === 'private') {
       if (await this.checkAuth(result._id, 'project', 'view') !== true) {
-        return ctx.body = yapi.commons.resReturn(null, 406, '没有权限');
+        return ctx.body = mock.commons.resReturn(null, 406, '没有权限');
       }
     }
     result = result.toObject();
-    let catInst = yapi.getInst(interfaceCatModel);
+    let catInst = mock.getInst(interfaceCatModel);
     let cat = await catInst.list(params.id);
     result.cat = cat;
     if(result.env.length === 0) {
@@ -376,8 +376,8 @@ class projectController extends baseController {
     }
     result.role = await this.getProjectRole(params.id, 'project');
 
-    yapi.emitHook('project_add', params.id).then();
-    ctx.body = yapi.commons.resReturn(result);
+    mock.emitHook('project_add', params.id).then();
+    ctx.body = mock.commons.resReturn(result);
   }
 
   /**
@@ -433,7 +433,7 @@ class projectController extends baseController {
       project_list = _.uniq(follow.concat(result), item => item._id)
     }
 
-    ctx.body = yapi.commons.resReturn({
+    ctx.body = mock.commons.resReturn({
       list: project_list
     });
 
@@ -454,18 +454,18 @@ class projectController extends baseController {
     let id = ctx.params.id;
 
     if (await this.checkAuth(id, 'project', 'danger') !== true) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
     }
 
-    let interfaceInst = yapi.getInst(interfaceModel);
-    let interfaceColInst = yapi.getInst(interfaceColModel);
-    let interfaceCaseInst = yapi.getInst(interfaceCaseModel);
+    let interfaceInst = mock.getInst(interfaceModel);
+    let interfaceColInst = mock.getInst(interfaceColModel);
+    let interfaceCaseInst = mock.getInst(interfaceCaseModel);
     await interfaceInst.delByProjectId(id)
     await interfaceCaseInst.delByProjectId(id)
     await interfaceColInst.delByProjectId(id)
-    yapi.emitHook('project_del', id).then();
+    mock.emitHook('project_del', id).then();
     let result = await this.Model.del(id);
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
 
   }
 
@@ -483,14 +483,14 @@ class projectController extends baseController {
    */
   async changeMemberRole(ctx) {
     let params = ctx.request.body;
-    let projectInst = yapi.getInst(projectModel);
+    let projectInst = mock.getInst(projectModel);
 
     var check = await projectInst.checkMemberRepeat(params.id, params.member_uid);
     if (check === 0) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '项目成员不存在');
+      return ctx.body = mock.commons.resReturn(null, 400, '项目成员不存在');
     }
     if (await this.checkAuth(params.id, 'project', 'danger') !== true) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
     }
 
     params.role = ['owner', 'dev', 'guest'].find(v => v === params.role) || 'dev';
@@ -503,8 +503,8 @@ class projectController extends baseController {
     let result = await projectInst.changeMemberRole(params.id, params.member_uid, params.role);
 
     let username = this.getUsername();
-    yapi.getInst(userModel).findById(params.member_uid).then((member) => {
-      yapi.commons.saveLog({
+    mock.getInst(userModel).findById(params.member_uid).then((member) => {
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 修改了项目中的成员 <a href="/user/profile/${params.member_uid}">${member.username}</a> 的角色为 "${rolename[params.role]}"`,
         type: 'project',
         uid: this.getUid(),
@@ -512,7 +512,7 @@ class projectController extends baseController {
         typeid: params.id
       });
     })
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
 
   }
 
@@ -532,23 +532,23 @@ class projectController extends baseController {
     let id = ctx.request.body.id;
     let data = {};
     if (await this.checkAuth(id, 'project', 'danger') !== true) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
     }
     data.color = ctx.request.body.color;
     data.icon = ctx.request.body.icon;
     if (!id) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '项目id不能为空');
+      return ctx.body = mock.commons.resReturn(null, 405, '项目id不能为空');
     }
     try {
       let result = await this.Model.up(id, data);
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 402, e.message);
+      ctx.body = mock.commons.resReturn(null, 402, e.message);
     }
     try {
       this.followModel.updateById(this.getUid(), id, data).then(() => {
         let username = this.getUsername();
-        yapi.commons.saveLog({
+        mock.commons.saveLog({
           content: `<a href="/user/profile/${this.getUid()}">${username}</a> 修改了项目图标、颜色`,
           type: 'project',
           uid: this.getUid(),
@@ -557,7 +557,7 @@ class projectController extends baseController {
         });
       });
     } catch (e) {
-      yapi.commons.log(e, 'error'); // eslint-disable-line
+      mock.commons.log(e, 'error'); // eslint-disable-line
     }
   }
 
@@ -579,7 +579,7 @@ class projectController extends baseController {
       let id = ctx.request.body.id;
       let params = ctx.request.body;
 
-      params = yapi.commons.handleParams(params, {
+      params = mock.commons.handleParams(params, {
         name: 'string',
         basepath: 'string',
         group_id: 'number',
@@ -590,18 +590,18 @@ class projectController extends baseController {
 
 
       if (!id) {
-        return ctx.body = yapi.commons.resReturn(null, 405, '项目id不能为空');
+        return ctx.body = mock.commons.resReturn(null, 405, '项目id不能为空');
       }
 
       if (await this.checkAuth(id, 'project', 'danger') !== true) {
-        return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+        return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
       }
 
       let projectData = await this.Model.get(id);
 
       if (params.basepath) {
         if ((params.basepath = this.handleBasepath(params.basepath)) === false) {
-          return ctx.body = yapi.commons.resReturn(null, 401, 'basepath格式有误');
+          return ctx.body = mock.commons.resReturn(null, 401, 'basepath格式有误');
         }
       }
 
@@ -612,13 +612,13 @@ class projectController extends baseController {
       if (params.name) {
         let checkRepeat = await this.Model.checkNameRepeat(params.name, params.group_id);
         if (checkRepeat > 0) {
-          return ctx.body = yapi.commons.resReturn(null, 401, '已存在的项目名');
+          return ctx.body = mock.commons.resReturn(null, 401, '已存在的项目名');
         }
       }
 
 
       let data = {
-        up_time: yapi.commons.time()
+        up_time: mock.commons.time()
       };
       if (params.project_type) {
         data.project_type = params.project_type
@@ -636,16 +636,16 @@ class projectController extends baseController {
     
       let result = await this.Model.up(id, data);
       let username = this.getUsername();
-      yapi.commons.saveLog({
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 更新了项目 <a href="/project/${id}/interface/api}">${projectData.name}</a>`,
         type: 'project',
         uid: this.getUid(),
         username: username,
         typeid: id
       });
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 402, e.message);
+      ctx.body = mock.commons.resReturn(null, 402, e.message);
     }
   }
 
@@ -669,39 +669,39 @@ class projectController extends baseController {
       let id = ctx.request.body.id;
       let params = ctx.request.body;
       if (!id) {
-        return ctx.body = yapi.commons.resReturn(null, 405, '项目id不能为空');
+        return ctx.body = mock.commons.resReturn(null, 405, '项目id不能为空');
       }
 
       if (await this.checkAuth(id, 'project', 'edit') !== true) {
-        return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+        return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
       }
 
       if (!params.env || !Array.isArray(params.env)) {
-        return ctx.body = yapi.commons.resReturn(null, 405, 'env参数格式有误');
+        return ctx.body = mock.commons.resReturn(null, 405, 'env参数格式有误');
       }
 
       let projectData = await this.Model.get(id);
       let data = {
-        up_time: yapi.commons.time()
+        up_time: mock.commons.time()
       };
 
       data.env = params.env;
       let isRepeat = this.arrRepeat(data.env, 'name');
       if (isRepeat) {
-        return ctx.body = yapi.commons.resReturn(null, 405, '环境变量名重复');
+        return ctx.body = mock.commons.resReturn(null, 405, '环境变量名重复');
       }
       let result = await this.Model.up(id, data);
       let username = this.getUsername();
-      yapi.commons.saveLog({
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 更新了项目 <a href="/project/${id}/interface/api">${projectData.name}</a> 的环境`,
         type: 'project',
         uid: this.getUid(),
         username: username,
         typeid: id
       });
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 402, e.message);
+      ctx.body = mock.commons.resReturn(null, 402, e.message);
     }
   }
 
@@ -727,16 +727,16 @@ class projectController extends baseController {
       let data = await this.tokenModel.get(project_id);
       let token;
       if (!data ) {
-        let passsalt = yapi.commons.randStr();
+        let passsalt = mock.commons.randStr();
         token = sha('sha1').update(passsalt).digest('hex').substr(0, 20);
         await this.tokenModel.save({project_id, token})
       } else {
         token = data.token;
       }
 
-      ctx.body = yapi.commons.resReturn(token);
+      ctx.body = mock.commons.resReturn(token);
     } catch (err) {
-      ctx.body = yapi.commons.resReturn(null, 402, err.message);
+      ctx.body = mock.commons.resReturn(null, 402, err.message);
     }
   }
 
@@ -756,17 +756,17 @@ class projectController extends baseController {
      let data = await this.tokenModel.get(project_id);
      let token, result;
      if (data && data.token ) {
-       let passsalt = yapi.commons.randStr();
+       let passsalt = mock.commons.randStr();
        token = sha('sha1').update(passsalt).digest('hex').substr(0, 20);
        result = await this.tokenModel.up(project_id, token)
        result.token = token
      } else {
-      ctx.body = yapi.commons.resReturn(null, 402, '没有查到token信息');
+      ctx.body = mock.commons.resReturn(null, 402, '没有查到token信息');
      }
 
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
    } catch (err) {
-     ctx.body = yapi.commons.resReturn(null, 402, err.message);
+     ctx.body = mock.commons.resReturn(null, 402, err.message);
    }
  }
 
@@ -786,11 +786,11 @@ class projectController extends baseController {
     const { q } = ctx.request.query;
 
     if (!q) {
-      return ctx.body = yapi.commons.resReturn(void 0, 400, 'No keyword.');
+      return ctx.body = mock.commons.resReturn(void 0, 400, 'No keyword.');
     }
 
-    if (!yapi.commons.validateSearchKeyword(q)) {
-      return ctx.body = yapi.commons.resReturn(void 0, 400, 'Bad query.');
+    if (!mock.commons.validateSearchKeyword(q)) {
+      return ctx.body = mock.commons.resReturn(void 0, 400, 'Bad query.');
     }
 
     let projectList = await this.Model.search(q);
@@ -823,7 +823,7 @@ class projectController extends baseController {
       group: groupList
     };
 
-    return ctx.body = yapi.commons.resReturn(queryList, 0, 'ok');
+    return ctx.body = mock.commons.resReturn(queryList, 0, 'ok');
   }
 }
 

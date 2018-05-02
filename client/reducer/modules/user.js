@@ -1,15 +1,15 @@
 import axios from 'axios';
 
 // Actions
-const LOGIN = 'yapi/user/LOGIN';
-const LOGIN_OUT = 'yapi/user/LOGIN_OUT';
-const LOGIN_TYPE = 'yapi/user/LOGIN_TYPE';
-const GET_LOGIN_STATE = 'yapi/user/GET_LOGIN_STATE';
-const REGISTER = 'yapi/user/REGISTER';
-const SET_BREADCRUMB = 'yapi/user/SET_BREADCRUMB';
-const CHANGE_STUDY_TIP = 'yapi/user/CHANGE_STUDY_TIP';
-const FINISH_STUDY = 'yapi/user/FINISH_STUDY';
-const SET_IMAGE_URL = 'yapi/user/SET_IMAGE_URL';
+const LOGIN = 'mock/user/LOGIN';
+const LOGIN_OUT = 'mock/user/LOGIN_OUT';
+const LOGIN_TYPE = 'mock/user/LOGIN_TYPE';
+const GET_LOGIN_STATE = 'mock/user/GET_LOGIN_STATE';
+const REGISTER = 'mock/user/REGISTER';
+const SET_BREADCRUMB = 'mock/user/SET_BREADCRUMB';
+const CHANGE_STUDY_TIP = 'mock/user/CHANGE_STUDY_TIP';
+const FINISH_STUDY = 'mock/user/FINISH_STUDY';
+const SET_IMAGE_URL = 'mock/user/SET_IMAGE_URL';
 
 // Reducer
 const LOADING_STATUS = 0;

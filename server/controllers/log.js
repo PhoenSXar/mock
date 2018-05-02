@@ -1,5 +1,5 @@
 const logModel = require('../models/log.js');
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseController = require('./base.js');
 const groupModel = require('../models/group');
 const projectModel = require('../models/project');
@@ -8,10 +8,10 @@ const interfaceModel = require('../models/interface');
 class logController extends baseController {
   constructor(ctx) {
     super(ctx);
-    this.Model = yapi.getInst(logModel);
-    this.groupModel = yapi.getInst(groupModel);
-    this.projectModel = yapi.getInst(projectModel);
-    this.interfaceModel = yapi.getInst(interfaceModel);
+    this.Model = mock.getInst(logModel);
+    this.groupModel = mock.getInst(groupModel);
+    this.projectModel = mock.getInst(projectModel);
+    this.interfaceModel = mock.getInst(interfaceModel);
     this.schemaMap = {
       listByUpdate: {
         "*type": 'string',
@@ -45,10 +45,10 @@ class logController extends baseController {
       type = ctx.request.query.type,
       interfaceId = ctx.request.query.interface_id;
     if (!typeid) {
-      return ctx.body = yapi.commons.resReturn(null, 400, 'typeid不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, 'typeid不能为空');
     }
     if (!type) {
-      return ctx.body = yapi.commons.resReturn(null, 400, 'type不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, 'type不能为空');
     }
     try {
       if (type === "group") {
@@ -67,7 +67,7 @@ class logController extends baseController {
           projectLogList[index] = item;
         })
         let total = await this.Model.listCountByGroup(typeid, projectIds);
-        ctx.body = yapi.commons.resReturn({
+        ctx.body = mock.commons.resReturn({
           list: projectLogList,
           total: Math.ceil(total / limit)
         });
@@ -75,14 +75,14 @@ class logController extends baseController {
         let result = await this.Model.listWithPaging(typeid, type, page, limit, interfaceId);
         let count = await this.Model.listCount(typeid, type, interfaceId);
 
-        ctx.body = yapi.commons.resReturn({
+        ctx.body = mock.commons.resReturn({
           total: Math.ceil(count / limit),
           list: result
         });
       }
 
     } catch (err) {
-      ctx.body = yapi.commons.resReturn(null, 402, err.message);
+      ctx.body = mock.commons.resReturn(null, 402, err.message);
     }
   }
   /**
@@ -123,9 +123,9 @@ class logController extends baseController {
       }
 
       // let result = await this.Model.listWithCatid(typeid, type, catId);
-      ctx.body = yapi.commons.resReturn(list);
+      ctx.body = mock.commons.resReturn(list);
     } catch (err) {
-      ctx.body = yapi.commons.resReturn(null, 402, err.message);
+      ctx.body = mock.commons.resReturn(null, 402, err.message);
     }
   }
 

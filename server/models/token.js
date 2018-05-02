@@ -1,4 +1,4 @@
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseModel = require('./base.js');
 
 class tokenModel extends baseModel {

@@ -1,5 +1,5 @@
 const userModel = require('../models/user.js');
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseController = require('./base.js');
 const common = require('../utils/commons.js');
 const ldap = require('../utils/ldap.js');
@@ -14,7 +14,7 @@ const jwt = require('jsonwebtoken');
 class userController extends baseController {
   constructor(ctx) {
     super(ctx);
-    this.Model = yapi.getInst(userModel);
+    this.Model = mock.getInst(userModel);
   }
   /**
    * 用户登录接口
@@ -28,26 +28,26 @@ class userController extends baseController {
    * @example ./api/user/login.json
    */
   async login(ctx) {   //登录
-    let userInst = yapi.getInst(userModel); //创建user实体
+    let userInst = mock.getInst(userModel); //创建user实体
     let email = ctx.request.body.email;
     let password = ctx.request.body.password;
 
     if (!email) {
-      return ctx.body = yapi.commons.resReturn(null, 400, 'email不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, 'email不能为空');
     }
     if (!password) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '密码不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '密码不能为空');
     }
 
     let result = await userInst.findByEmail(email);
 
 
     if (!result) {
-      return ctx.body = yapi.commons.resReturn(null, 404, '该用户不存在');
-    } else if (yapi.commons.generatePassword(password, result.passsalt) === result.password) {
+      return ctx.body = mock.commons.resReturn(null, 404, '该用户不存在');
+    } else if (mock.commons.generatePassword(password, result.passsalt) === result.password) {
       this.setLoginCookie(result._id, result.passsalt);
 
-      return ctx.body = yapi.commons.resReturn({
+      return ctx.body = mock.commons.resReturn({
         username: result.username,
         role: result.role,
         uid: result._id,
@@ -58,7 +58,7 @@ class userController extends baseController {
         study: result.study
       }, 0, 'logout success...');
     } else {
-      return ctx.body = yapi.commons.resReturn(null, 405, '密码错误');
+      return ctx.body = mock.commons.resReturn(null, 405, '密码错误');
     }
   }
 
@@ -73,9 +73,9 @@ class userController extends baseController {
    */
 
   async logout(ctx) {
-    ctx.cookies.set('_yapi_token', null);
-    ctx.cookies.set('_yapi_uid', null);
-    ctx.body = yapi.commons.resReturn('ok');
+    ctx.cookies.set('_mock_token', null);
+    ctx.cookies.set('_mock_uid', null);
+    ctx.body = mock.commons.resReturn('ok');
   }
 
   /**
@@ -89,30 +89,30 @@ class userController extends baseController {
    */
 
   async upStudy(ctx) {
-    let userInst = yapi.getInst(userModel); //创建user实体
+    let userInst = mock.getInst(userModel); //创建user实体
     let data = {
-      up_time: yapi.commons.time(),
+      up_time: mock.commons.time(),
       study: true
     };
     try {
       let result = await userInst.update(this.getUid(), data);
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 401, e.message);
+      ctx.body = mock.commons.resReturn(null, 401, e.message);
     }
   }
 
 
   async loginByToken(ctx) {
     try {
-      let ret = await yapi.emitHook('third_login', ctx);
+      let ret = await mock.emitHook('third_login', ctx);
       let login = await this.handleThirdLogin(ret.email, ret.username);
       if (login === true) {
-        yapi.commons.log('login success');
+        mock.commons.log('login success');
         ctx.redirect('/group');
       }
     } catch (e) {
-      yapi.commons.log(e.message, 'error');
+      mock.commons.log(e.message, 'error');
       ctx.redirect('/');
     }
   }
@@ -135,9 +135,9 @@ class userController extends baseController {
       await ldap.ldapQuery(email, password);
       let login = await this.handleThirdLogin(email, username);
       if (login === true) {
-        let userInst = yapi.getInst(userModel); //创建user实体
+        let userInst = mock.getInst(userModel); //创建user实体
         let result = await userInst.findByEmail(email);
-        return ctx.body = yapi.commons.resReturn({
+        return ctx.body = mock.commons.resReturn({
           username: result.username,
           role: result.role,
           uid: result._id,
@@ -149,8 +149,8 @@ class userController extends baseController {
         }, 0, 'logout success...');
       }
     } catch (e) {
-      yapi.commons.log(e.message, 'error');
-      return ctx.body = yapi.commons.resReturn(null, 401, e.message);
+      mock.commons.log(e.message, 'error');
+      return ctx.body = mock.commons.resReturn(null, 401, e.message);
     }
 
   }
@@ -160,26 +160,26 @@ class userController extends baseController {
 
   async handleThirdLogin(email, username) {
     let user, data, passsalt;
-    let userInst = yapi.getInst(userModel);
+    let userInst = mock.getInst(userModel);
 
     try {
       user = await userInst.findByEmail(email);
 
       if (!user || !user._id) {
-        passsalt = yapi.commons.randStr();
+        passsalt = mock.commons.randStr();
         data = {
           username: username,
-          password: yapi.commons.generatePassword(passsalt, passsalt),
+          password: mock.commons.generatePassword(passsalt, passsalt),
           email: email,
           passsalt: passsalt,
           role: 'member',
-          add_time: yapi.commons.time(),
-          up_time: yapi.commons.time(),
+          add_time: mock.commons.time(),
+          up_time: mock.commons.time(),
           type: 'third'
         };
         user = await userInst.save(data);
         await this.handlePrivateGroup(user._id, username, email);
-        yapi.commons.sendMail({
+        mock.commons.sendMail({
           to: email,
           contents: `<h3>亲爱的用户：</h3><p>您好，感谢使用Lemonce Mock Server平台，你的邮箱账号是：${email}</p>`
         });
@@ -206,53 +206,53 @@ class userController extends baseController {
    */
   async changePassword(ctx) {
     let params = ctx.request.body;
-    let userInst = yapi.getInst(userModel);
+    let userInst = mock.getInst(userModel);
 
     if (!params.uid) {
-      return ctx.body = yapi.commons.resReturn(null, 400, 'uid不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, 'uid不能为空');
     }
 
     if (!params.password) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '密码不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '密码不能为空');
     }
 
     let user = await userInst.findById(params.uid);
     if (this.getRole() !== 'admin' && params.uid != this.getUid()) {
-      return ctx.body = yapi.commons.resReturn(null, 402, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 402, '没有权限');
     }
 
     if (this.getRole() !== 'admin' || user.role === 'admin') {
       if (!params.old_password) {
-        return ctx.body = yapi.commons.resReturn(null, 400, '旧密码不能为空');
+        return ctx.body = mock.commons.resReturn(null, 400, '旧密码不能为空');
       }
 
 
-      if (yapi.commons.generatePassword(params.old_password, user.passsalt) !== user.password) {
-        return ctx.body = yapi.commons.resReturn(null, 402, '旧密码错误');
+      if (mock.commons.generatePassword(params.old_password, user.passsalt) !== user.password) {
+        return ctx.body = mock.commons.resReturn(null, 402, '旧密码错误');
       }
     }
 
-    let passsalt = yapi.commons.randStr();
+    let passsalt = mock.commons.randStr();
     let data = {
-      up_time: yapi.commons.time(),
-      password: yapi.commons.generatePassword(params.password, passsalt),
+      up_time: mock.commons.time(),
+      password: mock.commons.generatePassword(params.password, passsalt),
       passsalt: passsalt
     };
     try {
       let result = await userInst.update(params.uid, data);
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 401, e.message);
+      ctx.body = mock.commons.resReturn(null, 401, e.message);
     }
   }
 
   async handlePrivateGroup(uid, username, email) {
-    var groupInst = yapi.getInst(groupModel);
+    var groupInst = mock.getInst(groupModel);
     await groupInst.save({
       uid: uid,
       group_name: 'User-' + uid,
-      add_time: yapi.commons.time(),
-      up_time: yapi.commons.time(),
+      add_time: mock.commons.time(),
+      up_time: mock.commons.time(),
       type: 'private'
     })
 
@@ -261,12 +261,12 @@ class userController extends baseController {
   setLoginCookie(uid, passsalt) {
     let token = jwt.sign({ uid: uid }, passsalt, { expiresIn: '7 days' });
 
-    this.ctx.cookies.set('_yapi_token', token, {
-      expires: yapi.commons.expireDate(7),
+    this.ctx.cookies.set('_mock_token', token, {
+      expires: mock.commons.expireDate(7),
       httpOnly: true
     });
-    this.ctx.cookies.set('_yapi_uid', uid, {
-      expires: yapi.commons.expireDate(7),
+    this.ctx.cookies.set('_mock_uid', uid, {
+      expires: mock.commons.expireDate(7),
       httpOnly: true
     });
   }
@@ -284,38 +284,38 @@ class userController extends baseController {
    * @example ./api/user/login.json
    */
   async reg(ctx) {  //注册
-    let userInst = yapi.getInst(userModel);
+    let userInst = mock.getInst(userModel);
     let params = ctx.request.body; //获取请求的参数,检查是否存在用户名和密码
 
-    params = yapi.commons.handleParams(params, {
+    params = mock.commons.handleParams(params, {
       username: 'string',
       password: 'string',
       email: 'string'
     });
 
     if (!params.email) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '邮箱不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '邮箱不能为空');
     }
 
     if (!params.password) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '密码不能为空');
+      return ctx.body = mock.commons.resReturn(null, 400, '密码不能为空');
     }
 
     let checkRepeat = await userInst.checkRepeat(params.email);//然后检查是否已经存在该用户
 
     if (checkRepeat > 0) {
-      return ctx.body = yapi.commons.resReturn(null, 401, '该email已经注册');
+      return ctx.body = mock.commons.resReturn(null, 401, '该email已经注册');
     }
 
-    let passsalt = yapi.commons.randStr();
+    let passsalt = mock.commons.randStr();
     let data = {
       username: params.username,
-      password: yapi.commons.generatePassword(params.password, passsalt),//加密
+      password: mock.commons.generatePassword(params.password, passsalt),//加密
       email: params.email,
       passsalt: passsalt,
       role: 'member',
-      add_time: yapi.commons.time(),
-      up_time: yapi.commons.time(),
+      add_time: mock.commons.time(),
+      up_time: mock.commons.time(),
       type: "site"
     };
 
@@ -328,7 +328,7 @@ class userController extends baseController {
 
       this.setLoginCookie(user._id, user.passsalt);
       await this.handlePrivateGroup(user._id, user.username, user.email);
-      ctx.body = yapi.commons.resReturn({
+      ctx.body = mock.commons.resReturn({
         uid: user._id,
         email: user.email,
         username: user.username,
@@ -338,12 +338,12 @@ class userController extends baseController {
         type: user.type,
         study: false
       });
-      yapi.commons.sendMail({
+      mock.commons.sendMail({
         to: user.email,
         contents: `<h3>亲爱的用户：</h3><p>您好，感谢使用Lemonce Mock Server可视化接口平台,您的账号 ${params.email} 已经注册成功</p>`
       });
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 401, e.message);
+      ctx.body = mock.commons.resReturn(null, 401, e.message);
     }
   }
 
@@ -362,17 +362,17 @@ class userController extends baseController {
     let page = ctx.request.query.page || 1,
       limit = ctx.request.query.limit || 10;
 
-    const userInst = yapi.getInst(userModel);
+    const userInst = mock.getInst(userModel);
     try {
       let user = await userInst.listWithPaging(page, limit);
       let count = await userInst.listCount();
-      return ctx.body = yapi.commons.resReturn({
+      return ctx.body = mock.commons.resReturn({
         count: count,
         total: Math.ceil(count / limit),
         list: user
       });
     } catch (e) {
-      return ctx.body = yapi.commons.resReturn(null, 402, e.message);
+      return ctx.body = mock.commons.resReturn(null, 402, e.message);
     }
   }
 
@@ -388,20 +388,20 @@ class userController extends baseController {
    */
   async findById(ctx) {    //根据id获取用户信息
     try {
-      let userInst = yapi.getInst(userModel);
+      let userInst = mock.getInst(userModel);
       let id = ctx.request.query.id;
 
       if (!id) {
-        return ctx.body = yapi.commons.resReturn(null, 400, 'uid不能为空');
+        return ctx.body = mock.commons.resReturn(null, 400, 'uid不能为空');
       }
 
       let result = await userInst.findById(id);
 
       if (!result) {
-        return ctx.body = yapi.commons.resReturn(null, 402, '不存在的用户');
+        return ctx.body = mock.commons.resReturn(null, 402, '不存在的用户');
       }
 
-      return ctx.body = yapi.commons.resReturn({
+      return ctx.body = mock.commons.resReturn({
         uid: result._id,
         username: result.username,
         email: result.email,
@@ -411,7 +411,7 @@ class userController extends baseController {
         up_time: result.up_time
       });
     } catch (e) {
-      return ctx.body = yapi.commons.resReturn(null, 402, e.message);
+      return ctx.body = mock.commons.resReturn(null, 402, e.message);
     }
   }
 
@@ -428,23 +428,23 @@ class userController extends baseController {
   async del(ctx) {   //根据id删除一个用户
     try {
       if (this.getRole() !== 'admin') {
-        return ctx.body = yapi.commons.resReturn(null, 402, 'Without permission.');
+        return ctx.body = mock.commons.resReturn(null, 402, 'Without permission.');
       }
 
-      let userInst = yapi.getInst(userModel);
+      let userInst = mock.getInst(userModel);
       let id = ctx.request.body.id;
       if (id == this.getUid()) {
-        return ctx.body = yapi.commons.resReturn(null, 403, '禁止删除管理员');
+        return ctx.body = mock.commons.resReturn(null, 403, '禁止删除管理员');
       }
       if (!id) {
-        return ctx.body = yapi.commons.resReturn(null, 400, 'uid不能为空');
+        return ctx.body = mock.commons.resReturn(null, 400, 'uid不能为空');
       }
 
       let result = await userInst.del(id);
 
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 402, e.message);
+      ctx.body = mock.commons.resReturn(null, 402, e.message);
     }
   }
 
@@ -465,29 +465,29 @@ class userController extends baseController {
     try {
       let params = ctx.request.body;
 
-      params = yapi.commons.handleParams(params, {
+      params = mock.commons.handleParams(params, {
         username: 'string',
         email: 'string'
       });
 
       if (this.getRole() !== 'admin' && params.uid != this.getUid()) {
-        return ctx.body = yapi.commons.resReturn(null, 401, '没有权限');
+        return ctx.body = mock.commons.resReturn(null, 401, '没有权限');
       }
 
-      let userInst = yapi.getInst(userModel);
+      let userInst = mock.getInst(userModel);
       let id = params.uid;
 
       if (!id) {
-        return ctx.body = yapi.commons.resReturn(null, 400, 'uid不能为空');
+        return ctx.body = mock.commons.resReturn(null, 400, 'uid不能为空');
       }
 
       let userData = await userInst.findById(id);
       if (!userData) {
-        return ctx.body = yapi.commons.resReturn(null, 400, 'uid不存在');
+        return ctx.body = mock.commons.resReturn(null, 400, 'uid不存在');
       }
 
       let data = {
-        up_time: yapi.commons.time()
+        up_time: mock.commons.time()
       };
 
       params.username && (data.username = params.username);
@@ -496,7 +496,7 @@ class userController extends baseController {
       if (data.email) {
         var checkRepeat = await userInst.checkRepeat(data.email);//然后检查是否已经存在该用户
         if (checkRepeat > 0) {
-          return ctx.body = yapi.commons.resReturn(null, 401, '该email已经注册');
+          return ctx.body = mock.commons.resReturn(null, 401, '该email已经注册');
         }
       }
 
@@ -505,15 +505,15 @@ class userController extends baseController {
         username: data.username || userData.username,
         email: data.email || userData.email
       }
-      let groupInst = yapi.getInst(groupModel);
+      let groupInst = mock.getInst(groupModel);
       await groupInst.updateMember(member)
-      let projectInst = yapi.getInst(projectModel);
+      let projectInst = mock.getInst(projectModel);
       await projectInst.updateMember(member)
 
       let result = await userInst.update(id, data);
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 402, e.message);
+      ctx.body = mock.commons.resReturn(null, 402, e.message);
     }
   }
 
@@ -531,7 +531,7 @@ class userController extends baseController {
     try {
       let basecode = ctx.request.body.basecode;
       if (!basecode) {
-        return ctx.body = yapi.commons.resReturn(null, 400, 'basecode不能为空')
+        return ctx.body = mock.commons.resReturn(null, 400, 'basecode不能为空')
       }
       let pngPrefix = 'data:image/png;base64,';
       let jpegPrefix = 'data:image/jpeg;base64,';
@@ -543,19 +543,19 @@ class userController extends baseController {
         basecode = basecode.substr(jpegPrefix.length);
         type = 'image/jpeg';
       } else {
-        return ctx.body = yapi.commons.resReturn(null, 400, '仅支持jpeg和png格式的图片')
+        return ctx.body = mock.commons.resReturn(null, 400, '仅支持jpeg和png格式的图片')
       }
       let strLength = basecode.length;
       if (parseInt(strLength - (strLength / 8) * 2) > 200000) {
-        return ctx.body = yapi.commons.resReturn(null, 400, '图片大小不能超过200kb');
+        return ctx.body = mock.commons.resReturn(null, 400, '图片大小不能超过200kb');
       }
 
-      let avatarInst = yapi.getInst(avatarModel);
+      let avatarInst = mock.getInst(avatarModel);
       let result = await avatarInst.up(this.getUid(), basecode, type)
-      ctx.body = yapi.commons.resReturn(result);
+      ctx.body = mock.commons.resReturn(result);
 
     } catch (e) {
-      ctx.body = yapi.commons.resReturn(null, 401, e.message);
+      ctx.body = mock.commons.resReturn(null, 401, e.message);
     }
 
   }
@@ -574,11 +574,11 @@ class userController extends baseController {
 
     try {
       let uid = ctx.query.uid ? ctx.query.uid : this.getUid();
-      let avatarInst = yapi.getInst(avatarModel);
+      let avatarInst = mock.getInst(avatarModel);
       let data = await avatarInst.get(uid);
       let dataBuffer, type;
       if (!data || !data.basecode) {
-        dataBuffer = yapi.fs.readFileSync(yapi.path.join(yapi.WEBROOT, 'static/image/avatar.png'));
+        dataBuffer = mock.fs.readFileSync(mock.path.join(mock.WEBROOT, 'static/image/avatar.png'));
         type = 'image/png'
       } else {
         type = data.type;
@@ -606,11 +606,11 @@ class userController extends baseController {
     const { q } = ctx.request.query;
 
     if (!q) {
-      return ctx.body = yapi.commons.resReturn(void 0, 400, 'No keyword.');
+      return ctx.body = mock.commons.resReturn(void 0, 400, 'No keyword.');
     }
 
-    if (!yapi.commons.validateSearchKeyword(q)) {
-      return ctx.body = yapi.commons.resReturn(void 0, 400, 'Bad query.');
+    if (!mock.commons.validateSearchKeyword(q)) {
+      return ctx.body = mock.commons.resReturn(void 0, 400, 'Bad query.');
     }
 
     let queryList = await this.Model.search(q);
@@ -634,7 +634,7 @@ class userController extends baseController {
 
     let filteredRes = common.filterRes(queryList, rules);
 
-    return ctx.body = yapi.commons.resReturn(filteredRes, 0, 'ok');
+    return ctx.body = mock.commons.resReturn(filteredRes, 0, 'ok');
   }
 
   /**
@@ -653,7 +653,7 @@ class userController extends baseController {
     let result = {};
     try {
       if (type === 'interface') {
-        let interfaceInst = yapi.getInst(interfaceModel);
+        let interfaceInst = mock.getInst(interfaceModel);
         let interfaceData = await interfaceInst.get(id)
         result.interface = interfaceData;
         type = 'project';
@@ -661,7 +661,7 @@ class userController extends baseController {
       }
 
       if (type === 'project') {
-        let projectInst = yapi.getInst(projectModel);
+        let projectInst = mock.getInst(projectModel);
         let projectData = await projectInst.get(id);
         result.project = projectData.toObject();
         let ownerAuth = await this.checkAuth(id, 'project', 'danger'), devAuth;
@@ -680,7 +680,7 @@ class userController extends baseController {
       }
 
       if (type === 'group') {
-        let groupInst = yapi.getInst(groupModel);
+        let groupInst = mock.getInst(groupModel);
         let groupData = await groupInst.get(id);
         result.group = groupData.toObject();
         let ownerAuth = await this.checkAuth(id, 'group', 'danger'), devAuth;
@@ -697,10 +697,10 @@ class userController extends baseController {
 
       }
 
-      return ctx.body = yapi.commons.resReturn(result)
+      return ctx.body = mock.commons.resReturn(result)
     }
     catch (e) {
-      return ctx.body = yapi.commons.resReturn(result, 422, e.message)
+      return ctx.body = mock.commons.resReturn(result, 422, e.message)
     }
   }
 

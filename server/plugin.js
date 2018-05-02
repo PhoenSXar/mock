@@ -1,6 +1,6 @@
-const yapi = require('./yapi.js');
-const plugin_path = yapi.path.join(yapi.WEBROOT, 'node_modules');
-const plugin_system_path = yapi.path.join(yapi.WEBROOT, 'exts');
+const mock = require('./mock.js');
+const plugin_path = mock.path.join(mock.WEBROOT, 'node_modules');
+const plugin_system_path = mock.path.join(mock.WEBROOT, 'exts');
 const initPlugins = require('../common/plugin.js').initPlugins;
 var extConfig = require('../common/config.js').exts;
 
@@ -182,13 +182,13 @@ function emitHook(name) {
     if (hooks[name] && typeof hooks[name] === 'object') {
         let args = Array.prototype.slice.call(arguments, 1);
         if (hooks[name].type === 'single' && typeof hooks[name].listener === 'function') {
-            return Promise.resolve(hooks[name].listener.apply(yapi, args));
+            return Promise.resolve(hooks[name].listener.apply(mock, args));
         }
         let promiseAll = [];
         if (Array.isArray(hooks[name].listener)) {
             let listenerList = hooks[name].listener;
             for (let i = 0, l = listenerList.length; i < l; i++) {
-                promiseAll.push(Promise.resolve(listenerList[i].apply(yapi, args)));
+                promiseAll.push(Promise.resolve(listenerList[i].apply(mock, args)));
             }
         }
         return Promise.all(promiseAll);
@@ -198,21 +198,21 @@ function emitHook(name) {
 
 
 
-yapi.bindHook = bindHook;
-yapi.emitHook = emitHook;
-yapi.emitHookSync = emitHook;
+mock.bindHook = bindHook;
+mock.emitHook = emitHook;
+mock.emitHookSync = emitHook;
 
 
 
-let pluginsConfig = initPlugins(yapi.WEBCONFIG.plugins, 'plugin');
+let pluginsConfig = initPlugins(mock.WEBCONFIG.plugins, 'plugin');
 pluginsConfig.forEach(plugin => {
     if (!plugin || plugin.enable === false || plugin.server === false) return null;
 
-    if (!yapi.commons.fileExist(yapi.path.join(plugin_path, 'yapi-plugin-' + plugin.name + '/server.js'))) {
+    if (!mock.commons.fileExist(mock.path.join(plugin_path, 'mock-plugin-' + plugin.name + '/server.js'))) {
         throw new Error(`config.json配置了插件${plugin},但plugins目录没有找到此插件，请安装此插件`);
     }
-    let pluginModule = require(yapi.path.join(plugin_path, 'yapi-plugin-' + plugin.name + '/server.js'));
-    pluginModule.call(yapi, plugin.options)
+    let pluginModule = require(mock.path.join(plugin_path, 'mock-plugin-' + plugin.name + '/server.js'));
+    pluginModule.call(mock, plugin.options)
 })
 
 extConfig = initPlugins(extConfig, 'ext');
@@ -220,14 +220,14 @@ extConfig = initPlugins(extConfig, 'ext');
 extConfig.forEach(plugin => {
     if (!plugin || plugin.enable === false || plugin.server === false) return null;
 
-    if (!yapi.commons.fileExist(yapi.path.join(plugin_system_path, 'yapi-plugin-' + plugin.name + '/server.js'))) {
+    if (!mock.commons.fileExist(mock.path.join(plugin_system_path, 'mock-plugin-' + plugin.name + '/server.js'))) {
         throw new Error(`config.json配置了插件${plugin},但plugins目录没有找到此插件，请安装此插件`);
     }
-    let pluginModule = require(yapi.path.join(plugin_system_path, 'yapi-plugin-' + plugin.name + '/server.js'));
-    pluginModule.call(yapi, plugin.options)
+    let pluginModule = require(mock.path.join(plugin_system_path, 'mock-plugin-' + plugin.name + '/server.js'));
+    pluginModule.call(mock, plugin.options)
 })
 
 //delete bindHook方法，避免误操作
-delete yapi.bindHook
+delete mock.bindHook
 
 

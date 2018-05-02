@@ -1,6 +1,6 @@
 const koaRouter = require('koa-router');
 const interfaceController = require('./controllers/interface.js');
-const yapi = require('./yapi.js');
+const mock = require('./mock.js');
 
 const router = koaRouter();
 const { createAction } = require("./utils/commons.js")
@@ -23,7 +23,7 @@ function addPluginRouter(config) {
 function websocket(app) {
   createAction(router, "/api", interfaceController, "solveConflict", "/interface/solve_conflict", "get")
 
-  yapi.emitHookSync('add_ws_router', addPluginRouter);
+  mock.emitHookSync('add_ws_router', addPluginRouter);
 
   app.ws.use(router.routes())
   app.ws.use(router.allowedMethods());

@@ -1,9 +1,9 @@
 import axios from 'axios';
 
 // Actions
-const GET_FOLLOW_LIST = 'yapi/follow/GET_FOLLOW_LIST';
-const DEL_FOLLOW = 'yapi/follow/DEL_FOLLOW';
-const ADD_FOLLOW = 'yapi/follow/ADD_FOLLOW';
+const GET_FOLLOW_LIST = 'mock/follow/GET_FOLLOW_LIST';
+const DEL_FOLLOW = 'mock/follow/DEL_FOLLOW';
+const ADD_FOLLOW = 'mock/follow/ADD_FOLLOW';
 
 // Reducer
 const initialState = {

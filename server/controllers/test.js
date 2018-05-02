@@ -1,4 +1,4 @@
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseController = require('./base.js');
 
 class interfaceColController extends baseController{
@@ -16,16 +16,16 @@ class interfaceColController extends baseController{
     async testGet(ctx){
         try {
             let query = ctx.query;
-            ctx.body = yapi.commons.resReturn(query);
+            ctx.body = mock.commons.resReturn(query);
         } catch (e) {
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 
     async testHttpCode(ctx){
         let params = ctx.request.body;
         ctx.status = +ctx.query.code || 200;
-        ctx.body = yapi.commons.resReturn(params);
+        ctx.body = mock.commons.resReturn(params);
     }
 
     /**
@@ -38,10 +38,10 @@ class interfaceColController extends baseController{
     async testPost(ctx){
         try{
             let params = ctx.request.body;
-            ctx.body = yapi.commons.resReturn(params);
+            ctx.body = mock.commons.resReturn(params);
 
         }catch(e){
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 
@@ -55,10 +55,10 @@ class interfaceColController extends baseController{
     async testSingleUpload(ctx){
         try{
             let params = ctx.request.body;
-            ctx.body = yapi.commons.resReturn({res: '上传成功'});
+            ctx.body = mock.commons.resReturn({res: '上传成功'});
 
         }catch(e){
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 
@@ -72,10 +72,10 @@ class interfaceColController extends baseController{
     async testFilesUpload(ctx){
         try{
             let params = ctx.request.body;
-            ctx.body = yapi.commons.resReturn({res: '上传成功'});
+            ctx.body = mock.commons.resReturn({res: '上传成功'});
 
         }catch(e){
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 
@@ -89,10 +89,10 @@ class interfaceColController extends baseController{
     async testPut(ctx){
         try{
             let params = ctx.request.body;
-            ctx.body = yapi.commons.resReturn(params);
+            ctx.body = mock.commons.resReturn(params);
 
         }catch(e){
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 
@@ -106,10 +106,10 @@ class interfaceColController extends baseController{
     async testDelete(ctx){
         try{
             let params = ctx.request.body;
-            ctx.body = yapi.commons.resReturn(params);
+            ctx.body = mock.commons.resReturn(params);
 
         }catch(e){
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 
@@ -123,10 +123,10 @@ class interfaceColController extends baseController{
     async testHead(ctx){
         try{
             let query = ctx.query;
-            ctx.body = yapi.commons.resReturn(query);
+            ctx.body = mock.commons.resReturn(query);
 
         }catch(e){
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 
@@ -140,10 +140,10 @@ class interfaceColController extends baseController{
     async testOptions(ctx){
         try{
             let query = ctx.query;
-            ctx.body = yapi.commons.resReturn(query);
+            ctx.body = mock.commons.resReturn(query);
 
         }catch(e){
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 
@@ -157,10 +157,10 @@ class interfaceColController extends baseController{
     async testPatch(ctx){
         try{
             let params = ctx.request.body;
-            ctx.body = yapi.commons.resReturn(params);
+            ctx.body = mock.commons.resReturn(params);
 
         }catch(e){
-            ctx.body = yapi.commons.resReturn(null, 402, e.message);
+            ctx.body = mock.commons.resReturn(null, 402, e.message);
         }
     }
 

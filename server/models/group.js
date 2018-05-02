@@ -1,4 +1,4 @@
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseModel = require('./base.js');
 
 class groupModel extends baseModel {
@@ -145,7 +145,7 @@ class groupModel extends baseModel {
         custom_field1: data.custom_field1,
         group_name: data.group_name,
         group_desc: data.group_desc,
-        up_time: yapi.commons.time()
+        up_time: mock.commons.time()
 
       }
     );

@@ -1,11 +1,11 @@
 process.env.NODE_PATH = __dirname;
 require('module').Module._initPaths();
 
-const yapi = require('./yapi.js');
+const mock = require('./mock.js');
 const commons = require('./utils/commons');
-yapi.commons = commons;
+mock.commons = commons;
 const dbModule = require('./utils/db.js');
-yapi.connect = dbModule.connect();  
+mock.connect = dbModule.connect();  
 const mockServer = require('./middleware/mockServer.js');
 const plugins = require('./plugin.js');
 const websockify = require('koa-websocket');
@@ -21,7 +21,7 @@ let indexFile = process.argv[2] === 'dev' ? 'dev.html' : 'index.html';
 
 const app = websockify(new Koa());
 app.proxy = true;
-yapi.app = app;
+mock.app = app;
 
 app.use(bodyParser({multipart: true}));
 app.use(mockServer);
@@ -43,7 +43,7 @@ app.use( async (ctx, next) => {
 app.use( async (ctx, next)=>{
     if(ctx.path.indexOf('/prd') === 0){
         ctx.set('Cache-Control', 'max-age=8640000000');
-        if(yapi.commons.fileExist( yapi.path.join(yapi.WEBROOT, 'static', ctx.path+'.gz') )){
+        if(mock.commons.fileExist( mock.path.join(mock.WEBROOT, 'static', ctx.path+'.gz') )){
             ctx.set('Content-Encoding', 'gzip')
             ctx.path = ctx.path + '.gz';            
         }
@@ -52,9 +52,9 @@ app.use( async (ctx, next)=>{
 })
 
 app.use(koaStatic(
-    yapi.path.join(yapi.WEBROOT, 'static'),
+    mock.path.join(mock.WEBROOT, 'static'),
     {index: indexFile, gzip: true}
 ));
 
-app.listen(yapi.WEBCONFIG.port);
-commons.log(`the server is start at 127.0.0.1${ yapi.WEBCONFIG.port == '80' ? '' : ':' + yapi.WEBCONFIG.port}`); 
+app.listen(mock.WEBCONFIG.port);
+commons.log(`the server is start at 127.0.0.1${ mock.WEBCONFIG.port == '80' ? '' : ':' + mock.WEBCONFIG.port}`); 

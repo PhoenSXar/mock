@@ -2,20 +2,20 @@ import axios from 'axios';
 import variable from '../../constants/variable';
 
 // Actions
-const FETCH_PROJECT_LIST = 'yapi/project/FETCH_PROJECT_LIST';
-const PROJECT_ADD = 'yapi/project/PROJECT_ADD';
-const PROJECT_DEL = 'yapi/project/PROJECT_DEL';
-// const CHANGE_TABLE_LOADING = 'yapi/project/CHANGE_TABLE_LOADING';
-const PROJECT_UPDATE = 'yapi/project/PROJECT_UPDATE';
-const PROJECT_UPDATE_ENV = 'yapi/project/PROJECT_UPDATE_ENV';
-const PROJECT_UPSET = 'yapi/project/PROJECT_UPSET';
-const GET_CURR_PROJECT = 'yapi/project/GET_CURR_PROJECT'
-const GET_PEOJECT_MEMBER = 'yapi/project/GET_PEOJECT_MEMBER';
-const ADD_PROJECT_MEMBER = 'yapi/project/ADD_PROJECT_MEMBER';
-const DEL_PROJECT_MEMBER = 'yapi/project/DEL_PROJECT_MEMBER';
-const CHANGE_PROJECT_MEMBER = 'yapi/project/CHANGE_PROJECT_MEMBER';
-const GET_TOKEN = 'yapi/project/GET_TOKEN';
-const UPDATE_TOKEN = 'yapi/project/UPDATE_TOKEN';
+const FETCH_PROJECT_LIST = 'mock/project/FETCH_PROJECT_LIST';
+const PROJECT_ADD = 'mock/project/PROJECT_ADD';
+const PROJECT_DEL = 'mock/project/PROJECT_DEL';
+// const CHANGE_TABLE_LOADING = 'mock/project/CHANGE_TABLE_LOADING';
+const PROJECT_UPDATE = 'mock/project/PROJECT_UPDATE';
+const PROJECT_UPDATE_ENV = 'mock/project/PROJECT_UPDATE_ENV';
+const PROJECT_UPSET = 'mock/project/PROJECT_UPSET';
+const GET_CURR_PROJECT = 'mock/project/GET_CURR_PROJECT'
+const GET_PEOJECT_MEMBER = 'mock/project/GET_PEOJECT_MEMBER';
+const ADD_PROJECT_MEMBER = 'mock/project/ADD_PROJECT_MEMBER';
+const DEL_PROJECT_MEMBER = 'mock/project/DEL_PROJECT_MEMBER';
+const CHANGE_PROJECT_MEMBER = 'mock/project/CHANGE_PROJECT_MEMBER';
+const GET_TOKEN = 'mock/project/GET_TOKEN';
+const UPDATE_TOKEN = 'mock/project/UPDATE_TOKEN';
 
 // Reducer
 const initialState = {

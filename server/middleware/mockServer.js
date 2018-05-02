@@ -1,4 +1,4 @@
-const yapi = require("../yapi.js");
+const mock = require("../mock.js");
 const projectModel = require("../models/project.js");
 const interfaceModel = require("../models/interface.js");
 const mockExtra = require("../../common/mock-extra.js");
@@ -89,7 +89,7 @@ function handleCorsRequest(ctx) {
 module.exports = async (ctx, next) => {
   // no used variable 'hostname' & 'config'
   // let hostname = ctx.hostname;
-  // let config = yapi.WEBCONFIG;
+  // let config = mock.WEBCONFIG;
   let path = ctx.path;
 
   if (path.indexOf("/mock/") !== 0) {
@@ -102,23 +102,23 @@ module.exports = async (ctx, next) => {
   paths.splice(0, 3);
   path = "/" + paths.join("/");
   if (!projectId) {
-    return (ctx.body = yapi.commons.resReturn(null, 400, "projectId不能为空"));
+    return (ctx.body = mock.commons.resReturn(null, 400, "projectId不能为空"));
   }
 
-  let projectInst = yapi.getInst(projectModel),
+  let projectInst = mock.getInst(projectModel),
     project;
   try {
     project = await projectInst.get(projectId);
   } catch (e) {
-    return (ctx.body = yapi.commons.resReturn(null, 403, e.message));
+    return (ctx.body = mock.commons.resReturn(null, 403, e.message));
   }
 
   if (!project) {
-    return (ctx.body = yapi.commons.resReturn(null, 400, "不存在的项目"));
+    return (ctx.body = mock.commons.resReturn(null, 400, "不存在的项目"));
   }
 
   let interfaceData, newpath;
-  let interfaceInst = yapi.getInst(interfaceModel);
+  let interfaceInst = mock.getInst(interfaceModel);
 
   try {
     newpath = path.substr(project.basepath.length);
@@ -188,7 +188,7 @@ module.exports = async (ctx, next) => {
         ) {
           return handleCorsRequest(ctx);
         }
-        return (ctx.body = yapi.commons.resReturn(
+        return (ctx.body = mock.commons.resReturn(
           null,
           404,
           `不存在的api, 当前请求path为 ${newpath}， 请求方法为 ${
@@ -200,7 +200,7 @@ module.exports = async (ctx, next) => {
     }
 
     if (interfaceData.length > 1) {
-      return (ctx.body = yapi.commons.resReturn(
+      return (ctx.body = mock.commons.resReturn(
         null,
         405,
         "存在多个api，请检查数据库"
@@ -217,10 +217,10 @@ module.exports = async (ctx, next) => {
       if (interfaceData.res_body_type === "json") {
         if (interfaceData.res_body_is_json_schema === true) {
           //json-schema
-          const schema = yapi.commons.json_parse(interfaceData.res_body);
-          res = yapi.commons.schemaToJson(schema);
+          const schema = mock.commons.json_parse(interfaceData.res_body);
+          res = mock.commons.schemaToJson(schema);
         } else {
-          res = mockExtra(yapi.commons.json_parse(interfaceData.res_body), {
+          res = mockExtra(mock.commons.json_parse(interfaceData.res_body), {
             query: ctx.request.query,
             body: ctx.request.body,
             params: Object.assign({}, ctx.request.query, ctx.request.body)
@@ -230,7 +230,7 @@ module.exports = async (ctx, next) => {
         try {
           res = Mock.mock(res);
         } catch (e) {
-          yapi.commons.log(e, "error");
+          mock.commons.log(e, "error");
         }
       }
 
@@ -243,7 +243,7 @@ module.exports = async (ctx, next) => {
         httpCode: 200,
         delay: 0
       };
-      await yapi.emitHook("mock_after", context);
+      await mock.emitHook("mock_after", context);
       let handleMock = new Promise(resolve => {
         setTimeout(() => {
           resolve(true);
@@ -284,7 +284,7 @@ module.exports = async (ctx, next) => {
       ctx.status = context.httpCode;
       return (ctx.body = context.mockJson);
     } catch (e) {
-      yapi.commons.log(e, "error");
+      mock.commons.log(e, "error");
       return (ctx.body = {
         errcode: 400,
         errmsg: "解析出错，请检查。Error: " + e.message,
@@ -292,7 +292,7 @@ module.exports = async (ctx, next) => {
       });
     }
   } catch (e) {
-    yapi.commons.log(e, "error");
-    return (ctx.body = yapi.commons.resReturn(null, 409, e.message));
+    mock.commons.log(e, "error");
+    return (ctx.body = mock.commons.resReturn(null, 409, e.message));
   }
 };

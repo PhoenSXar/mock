@@ -1,4 +1,4 @@
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const projectModel = require('../models/project.js');
 const userModel = require('../models/user.js');
 const interfaceModel = require('../models/interface.js');
@@ -44,12 +44,12 @@ class baseController {
   }
 
   async checkLogin(ctx) {
-    let token = ctx.cookies.get('_yapi_token');
-    let uid = ctx.cookies.get('_yapi_uid');
+    let token = ctx.cookies.get('_mock_token');
+    let uid = ctx.cookies.get('_mock_uid');
 
     try {
       if (!token || !uid) return false;
-      let userInst = yapi.getInst(userModel); //创建user实体
+      let userInst = mock.getInst(userModel); //创建user实体
       let result = await userInst.findById(uid);
       let decoded = jwt.verify(token, result.passsalt);
 
@@ -68,11 +68,11 @@ class baseController {
   }
 
   async checkLDAP() {
-    // console.log('config', yapi.WEBCONFIG);
-    if (!yapi.WEBCONFIG.ldapLogin) {
+    // console.log('config', mock.WEBCONFIG);
+    if (!mock.WEBCONFIG.ldapLogin) {
       return false
     } else {
-      return yapi.WEBCONFIG.ldapLogin.enable || false
+      return mock.WEBCONFIG.ldapLogin.enable || false
     }
 
   }
@@ -84,10 +84,10 @@ class baseController {
   async getLoginStatus(ctx) {
     let body;
     if (await this.checkLogin(ctx) === true) {
-      let result = yapi.commons.fieldSelect(this.$user, ['_id', 'username', 'email', 'up_time', 'add_time', 'role', 'type', 'study']);
-      body = yapi.commons.resReturn(result);
+      let result = mock.commons.fieldSelect(this.$user, ['_id', 'username', 'email', 'up_time', 'add_time', 'role', 'type', 'study']);
+      body = mock.commons.resReturn(result);
     } else {
-      body = yapi.commons.resReturn(null, 40011, '请登录...');
+      body = mock.commons.resReturn(null, 40011, '请登录...');
     }
 
     body.ladp = await this.checkLDAP();
@@ -113,7 +113,7 @@ class baseController {
         return 'admin';
       }
       if (type === 'interface') {
-        let interfaceInst = yapi.getInst(interfaceModel);
+        let interfaceInst = mock.getInst(interfaceModel);
         let interfaceData = await interfaceInst.get(id)
         result.interfaceData = interfaceData;
         // 项目创建者相当于 owner
@@ -125,7 +125,7 @@ class baseController {
       }
 
       if (type === 'project') {
-        let projectInst = yapi.getInst(projectModel);
+        let projectInst = mock.getInst(projectModel);
         let projectData = await projectInst.get(id);
         if (projectData.uid === this.getUid()) {
           return 'owner';
@@ -150,7 +150,7 @@ class baseController {
       }
 
       if (type === 'group') {
-        let groupInst = yapi.getInst(groupModel);
+        let groupInst = mock.getInst(groupModel);
         let groupData = await groupInst.get(id);
         if (groupData.uid === this.getUid()) {
           return 'owner';
@@ -176,7 +176,7 @@ class baseController {
       return 'member';
     }
     catch (e) {
-      yapi.commons.log(e.message, 'error')
+      mock.commons.log(e.message, 'error')
       return false;
     }
   }

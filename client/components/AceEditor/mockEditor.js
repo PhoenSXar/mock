@@ -65,7 +65,7 @@ ace.acequire("ace/commands/default_commands").commands.push({
   name: "Toggle Fullscreen",
   bindKey: "F9",
   exec: function(editor) {  
-    if(editor._fullscreen_yapi){
+    if(editor._fullscreen_mock){
       let fullScreen = dom.toggleCssClass(document.body, "fullScreen")
       dom.setCssClass(editor.container, "fullScreen", fullScreen)
       editor.setAutoScrollEditorIntoView(!fullScreen)
@@ -114,7 +114,7 @@ function run(options) {
     enableLiveAutocompletion: true,
     useWorker: true
   });
-  editor._fullscreen_yapi = options.fullScreen;
+  editor._fullscreen_mock = options.fullScreen;
   mockEditor = {
     curData: {},
     getValue: ()=>mockEditor.curData.text,

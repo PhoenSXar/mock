@@ -5,7 +5,7 @@ const userController = require('./controllers/user.js');
 const interfaceColController = require('./controllers/interfaceCol.js');
 const testController = require('./controllers/test.js');
 
-const yapi = require('./yapi.js');
+const mock = require('./mock.js');
 const projectController = require('./controllers/project.js');
 const logController = require('./controllers/log.js');
 const followController = require('./controllers/follow.js');
@@ -504,7 +504,7 @@ function addPluginRouter(config) {
 	createAction(router, "/api", config.controller, config.action, routerPath, method, false);
 }
 
-yapi.emitHookSync('add_router', addPluginRouter);
+mock.emitHookSync('add_router', addPluginRouter);
 
 for (let ctrl in routerConfig) {
 	let actions = routerConfig[ctrl];

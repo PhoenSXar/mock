@@ -1,10 +1,10 @@
 import axios from 'axios'
 // Actions
-const FETCH_INTERFACE_COL_LIST = 'yapi/interfaceCol/FETCH_INTERFACE_COL_LIST';
-const FETCH_CASE_DATA = 'yapi/interfaceCol/FETCH_CASE_DATA';
-const FETCH_CASE_LIST = 'yapi/interfaceCol/FETCH_CASE_LIST';
-const SET_COL_DATA = 'yapi/interfaceCol/SET_COL_DATA';
-const FETCH_VARIABLE_PARAMS_LIST = 'yapi/interfaceCol/FETCH_VARIABLE_PARAMS_LIST';
+const FETCH_INTERFACE_COL_LIST = 'mock/interfaceCol/FETCH_INTERFACE_COL_LIST';
+const FETCH_CASE_DATA = 'mock/interfaceCol/FETCH_CASE_DATA';
+const FETCH_CASE_LIST = 'mock/interfaceCol/FETCH_CASE_LIST';
+const SET_COL_DATA = 'mock/interfaceCol/SET_COL_DATA';
+const FETCH_VARIABLE_PARAMS_LIST = 'mock/interfaceCol/FETCH_VARIABLE_PARAMS_LIST';
 
 // Reducer
 const initialState = {

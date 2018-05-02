@@ -22,9 +22,9 @@ var compressPlugin = new CompressionPlugin({
 function createScript(plugin, pathAlias){
   let options = plugin.options ? JSON.stringify(plugin.options) : null
   if(pathAlias === 'node_modules'){
-    return `"${plugin.name}" : {module: require('yapi-plugin-${plugin.name}/client.js'),options: ${options}}`
+    return `"${plugin.name}" : {module: require('mock-plugin-${plugin.name}/client.js'),options: ${options}}`
   }
-  return `"${plugin.name}" : {module: require('${pathAlias}/yapi-plugin-${plugin.name}/client.js'),options: ${options}}`
+  return `"${plugin.name}" : {module: require('${pathAlias}/mock-plugin-${plugin.name}/client.js'),options: ${options}}`
 }
 
 function initPlugins(configPlugin){
@@ -71,7 +71,7 @@ module.exports = {
         defaultQuery.plugins.push(["import", { libraryName: "antd"}])
         return defaultQuery;
       },
-      exclude: /node_modules\/(?!_?(yapi-plugin|json-schema-editor-visual))/
+      exclude: /node_modules\/(?!_?(mock-plugin|json-schema-editor-visual))/
     }    
   }],    
   devtool:  'cheap-source-map',

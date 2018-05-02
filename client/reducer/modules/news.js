@@ -1,6 +1,6 @@
 // Actions
-const FETCH_NEWS_DATA = 'yapi/news/FETCH_NEWS_DATA';
-const FETCH_MORE_NEWS = 'yapi/news/FETCH_MORE_NEWS';
+const FETCH_NEWS_DATA = 'mock/news/FETCH_NEWS_DATA';
+const FETCH_MORE_NEWS = 'mock/news/FETCH_MORE_NEWS';
 // Reducer
 const initialState = {
   newsData: {

@@ -1,5 +1,5 @@
 const groupModel = require('../models/group.js');
-const yapi = require('../yapi.js');
+const mock = require('../mock.js');
 const baseController = require('./base.js');
 const projectModel = require('../models/project.js');
 const userModel = require('../models/user.js');
@@ -99,14 +99,14 @@ class groupController extends baseController {
   async get(ctx) {
     let params = ctx.params;
 
-    let groupInst = yapi.getInst(groupModel);
+    let groupInst = mock.getInst(groupModel);
     let result = await groupInst.getGroupById(params.id);
     result = result.toObject();
     result.role = await this.getProjectRole(params.id, 'group');
     if (result.type === 'private') {
       result.group_name = '个人空间';
     }
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
   }
 
   /**
@@ -125,7 +125,7 @@ class groupController extends baseController {
     let params = ctx.params;
 
     if (this.getRole() !== 'admin') {
-      return ctx.body = yapi.commons.resReturn(null, 401, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 401, '没有权限');
     }
 
     let owners = [];
@@ -140,12 +140,12 @@ class groupController extends baseController {
       }
     }
 
-    let groupInst = yapi.getInst(groupModel);
+    let groupInst = mock.getInst(groupModel);
 
     let checkRepeat = await groupInst.checkRepeat(params.group_name);
 
     if (checkRepeat > 0) {
-      return ctx.body = yapi.commons.resReturn(null, 401, '项目分组名已存在');
+      return ctx.body = mock.commons.resReturn(null, 401, '项目分组名已存在');
     }
 
     
@@ -154,22 +154,22 @@ class groupController extends baseController {
       group_name: params.group_name,
       group_desc: params.group_desc,
       uid: this.getUid(),
-      add_time: yapi.commons.time(),
-      up_time: yapi.commons.time(),
+      add_time: mock.commons.time(),
+      up_time: mock.commons.time(),
       members: owners
     };
 
     let result = await groupInst.save(data);
-    result = yapi.commons.fieldSelect(result, ['_id', 'group_name', 'group_desc', 'uid', 'members', 'type']);
+    result = mock.commons.fieldSelect(result, ['_id', 'group_name', 'group_desc', 'uid', 'members', 'type']);
     let username = this.getUsername();
-    yapi.commons.saveLog({
+    mock.commons.saveLog({
       content: `<a href="/user/profile/${this.getUid()}">${username}</a> 新增了分组 <a href="/group/${result._id}">${params.group_name}</a>`,
       type: 'group',
       uid: this.getUid(),
       username: username,
       typeid: result._id
     });
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
 
   }
 
@@ -182,7 +182,7 @@ class groupController extends baseController {
 
   async getUserdata(uid, role) {
     role = role || 'dev';
-    let userInst = yapi.getInst(userModel);
+    let userInst = mock.getInst(userModel);
     let userData = await userInst.findById(uid);
     if (!userData) {
       return null;
@@ -211,7 +211,7 @@ class groupController extends baseController {
   async addMember(ctx) {
 
     let params = ctx.params;
-    let groupInst = yapi.getInst(groupModel);
+    let groupInst = mock.getInst(groupModel);
 
     params.role = ['owner', 'dev', 'guest'].find(v => v === params.role) || 'dev';
     let add_members = [];
@@ -239,7 +239,7 @@ class groupController extends baseController {
         return `<a href = "/user/profile/${item.uid}">${item.username}</a>`
       })
       members = members.join("、");
-      yapi.commons.saveLog({
+      mock.commons.saveLog({
         content: `<a href="/user/profile/${this.getUid()}">${username}</a> 新增了分组成员 ${members} 为 ${rolename[params.role]}`,
         type: 'group',
         uid: this.getUid(),
@@ -247,7 +247,7 @@ class groupController extends baseController {
         typeid: params.id
       });
     }
-    ctx.body = yapi.commons.resReturn({
+    ctx.body = mock.commons.resReturn({
       result,
       add_members,
       exist_members,
@@ -271,14 +271,14 @@ class groupController extends baseController {
    */
   async changeMemberRole(ctx) {
     let params = ctx.request.body;
-    let groupInst = yapi.getInst(groupModel);
+    let groupInst = mock.getInst(groupModel);
 
     var check = await groupInst.checkMemberRepeat(params.id, params.member_uid);
     if (check === 0) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '分组成员不存在');
+      return ctx.body = mock.commons.resReturn(null, 400, '分组成员不存在');
     }
     if (await this.checkAuth(params.id, 'group', 'danger') !== true) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
     }
 
     params.role = ['owner', 'dev', 'guest'].find(v => v === params.role) || 'dev';
@@ -288,14 +288,14 @@ class groupController extends baseController {
     let username = this.getUsername();
 
     let groupUserdata = await this.getUserdata(params.member_uid, params.role);
-    yapi.commons.saveLog({
+    mock.commons.saveLog({
       content: `<a href="/user/profile/${this.getUid()}">${username}</a> 更改了分组成员 <a href="/user/profile/${params.member_uid}">${groupUserdata.username}</a> 的权限为 "${rolename[params.role]}"`,
       type: 'group',
       uid: this.getUid(),
       username: username,
       typeid: params.id
     });
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
 
   }
 
@@ -312,9 +312,9 @@ class groupController extends baseController {
 
   async getMemberList(ctx) {
     let params = ctx.params;
-    let groupInst = yapi.getInst(groupModel);
+    let groupInst = mock.getInst(groupModel);
     let group = await groupInst.get(params.id);
-    ctx.body = yapi.commons.resReturn(group.members);
+    ctx.body = mock.commons.resReturn(group.members);
   }
 
   /**
@@ -331,13 +331,13 @@ class groupController extends baseController {
 
   async delMember(ctx) {
     let params = ctx.params;
-    let groupInst = yapi.getInst(groupModel);
+    let groupInst = mock.getInst(groupModel);
     var check = await groupInst.checkMemberRepeat(params.id, params.member_uid);
     if (check === 0) {
-      return ctx.body = yapi.commons.resReturn(null, 400, '分组成员不存在');
+      return ctx.body = mock.commons.resReturn(null, 400, '分组成员不存在');
     }
     if (await this.checkAuth(params.id, 'group', 'danger') !== true) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
     }
 
 
@@ -345,14 +345,14 @@ class groupController extends baseController {
     let username = this.getUsername();
 
     let groupUserdata = await this.getUserdata(params.member_uid, params.role);
-    yapi.commons.saveLog({
+    mock.commons.saveLog({
       content: `<a href="/user/profile/${this.getUid()}">${username}</a> 删除了分组成员 <a href="/user/profile/${params.member_uid}">${groupUserdata.username}</a>`,
       type: 'group',
       uid: this.getUid(),
       username: username,
       typeid: params.id
     });
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
 
   }
 
@@ -367,8 +367,8 @@ class groupController extends baseController {
    */
   async list(ctx) {
 
-    var groupInst = yapi.getInst(groupModel);
-    let projectInst = yapi.getInst(projectModel);
+    var groupInst = mock.getInst(groupModel);
+    let projectInst = mock.getInst(projectModel);
     let result = await groupInst.list();
 
     let privateGroup = await groupInst.getByPrivateUid(this.getUid());
@@ -378,8 +378,8 @@ class groupController extends baseController {
       privateGroup = await groupInst.save({
         uid: this.getUid(),
         group_name: 'User-' + this.getUid(),
-        add_time: yapi.commons.time(),
-        up_time: yapi.commons.time(),
+        add_time: mock.commons.time(),
+        up_time: mock.commons.time(),
         type: 'private'
       })
     }
@@ -412,7 +412,7 @@ class groupController extends baseController {
       newResult.unshift(privateGroup);
     }
 
-    ctx.body = yapi.commons.resReturn(newResult);
+    ctx.body = mock.commons.resReturn(newResult);
 
   }
 
@@ -428,14 +428,14 @@ class groupController extends baseController {
    */
   async del(ctx) {
     if (this.getRole() !== 'admin') {
-      return ctx.body = yapi.commons.resReturn(null, 401, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 401, '没有权限');
     }
 
-    let groupInst = yapi.getInst(groupModel);
-    let projectInst = yapi.getInst(projectModel);
-    let interfaceInst = yapi.getInst(interfaceModel);
-    let interfaceColInst = yapi.getInst(interfaceColModel);
-    let interfaceCaseInst = yapi.getInst(interfaceCaseModel);
+    let groupInst = mock.getInst(groupModel);
+    let projectInst = mock.getInst(projectModel);
+    let interfaceInst = mock.getInst(interfaceModel);
+    let interfaceColInst = mock.getInst(interfaceColModel);
+    let interfaceCaseInst = mock.getInst(interfaceCaseModel);
     let id = ctx.params.id;
 
     let projectList = await projectInst.list(id, true);
@@ -449,7 +449,7 @@ class groupController extends baseController {
     }
 
     let result = await groupInst.del(id);
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
 
   }
 
@@ -467,23 +467,23 @@ class groupController extends baseController {
    */
   async up(ctx) {
 
-    let groupInst = yapi.getInst(groupModel);
+    let groupInst = mock.getInst(groupModel);
     let params = ctx.params;
 
     if (await this.checkAuth(params.id, 'group', 'danger') !== true) {
-      return ctx.body = yapi.commons.resReturn(null, 405, '没有权限');
+      return ctx.body = mock.commons.resReturn(null, 405, '没有权限');
     }
 
     let result = await groupInst.up(params.id, params);
     let username = this.getUsername();
-    yapi.commons.saveLog({
+    mock.commons.saveLog({
       content: `<a href="/user/profile/${this.getUid()}">${username}</a> 更新了 <a href="/group/${params.id}">${params.group_name}</a> 分组`,
       type: 'group',
       uid: this.getUid(),
       username: username,
       typeid: params.id
     });
-    ctx.body = yapi.commons.resReturn(result);
+    ctx.body = mock.commons.resReturn(result);
   }
 }
 
