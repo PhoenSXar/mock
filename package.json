@@ -1,7 +1,7 @@
 {
-  "name": "yapi",
+  "name": "mock",
   "version": "1.3.9",
-  "description": "YAPI",
+  "description": "Lemonce Mock Server",
   "main": "index.js",
   "scripts": {
     "dev-copy-icon": "cp -r static/iconfont ./",
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:YMFE/yapi.git"
+    "url": "https://github.com/PhoenSXar/mock"
   },
   "author": "",
   "license": "Apache2.0",
